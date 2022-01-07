@@ -27,17 +27,10 @@ public class DataController {
 	private DataService dataService;
 
 	@GetMapping("/getData")
-	public List<DataResponse> getListFiles(@RequestBody DataRequestDto data) {
-		List<DataResponse> files = dataService.getAllFiles().map(dbFile -> {
-			String fileDownloadUri = 
-					ServletUriComponentsBuilder.fromCurrentContextPath()
-					.path("/db/files/")
-					.path(dbFile.getId())
-					.toUriString();
+	public ResponseEntity getData(@RequestBody DataRequestDto input) {
+		List<DataResponse> data = dataService.getData(input);
 
-			return new ResponseFile(dbFile.getName(), fileDownloadUri, dbFile.getType(), dbFile.getData().length);
-		}).collect(Collectors.toList());
 
-		return ResponseEntity.status(HttpStatus.OK).body(files);
+		return ResponseEntity.status(HttpStatus.OK).body(data);
 	}
 }
