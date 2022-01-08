@@ -2,9 +2,11 @@ package com.sks.hawkeye.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@ToString
 public class Filtering {
 
 	private String batsman1 ;

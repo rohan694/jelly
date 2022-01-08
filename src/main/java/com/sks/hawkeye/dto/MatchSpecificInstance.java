@@ -8,8 +8,8 @@ import lombok.Setter;
 public class MatchSpecificInstance {
 
 	private String date;
-	private String over;
-	private String ball;
+	private int over;
+	private int ball;
 	
 	
 }
