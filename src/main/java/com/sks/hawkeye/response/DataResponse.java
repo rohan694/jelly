@@ -12,8 +12,9 @@ public class DataResponse {
 	private String matchName;
 	private String battingTeamName;
 	private String batsman1;
+	private String batsman1RightHanded;
 	private String batsman2;
-	private boolean isRightHand;
+	private boolean batsman2RightHand;
 	private String bowlingTeamName;
 	private String bowlerName;
 	private String ball;
