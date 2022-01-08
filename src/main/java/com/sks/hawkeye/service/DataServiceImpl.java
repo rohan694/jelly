@@ -1,5 +1,6 @@
 package com.sks.hawkeye.service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,10 +10,14 @@ import javax.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCountCallbackHandler;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import com.sks.hawkeye.dto.DataRequestDto;
+import com.sks.hawkeye.mapper.ResponseDtoMapper;
 import com.sks.hawkeye.response.DataResponse;
+import com.sks.hawkeye.util.CommonUtil;
 
 @Service
 public class DataServiceImpl implements DataService {
@@ -20,6 +25,8 @@ public class DataServiceImpl implements DataService {
 	@PersistenceContext
 	private EntityManager entityManager;
 	
+	@Autowired
+	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -42,7 +49,7 @@ public class DataServiceImpl implements DataService {
 				+ "shot_info.shot_attacked as shotAttacked, shot_info.shot_played as shotPlayed, "
 				+ "ba.name as battingTeamName,"
 				+ " ma.name as matchName "
-				+ "from TourSnapShotEntity as tss "
+				+ "from Tour_Snap_Shot as tss "
 				+ "INNER JOIN match as ma ON ma.tour_id = tss.tour_name "
 				+ "INNER JOIN batting_team as ba ON ba.match_id = ma.id "
 				+ "INNER JOIN batsman as bsmn ON ba.pid = bsmn.batting_team_pid "
@@ -63,119 +70,126 @@ public class DataServiceImpl implements DataService {
 				+ "where tour_name = :tour_name and format = :format and ma.name = :match_name";
 		String durationFilter = "";
 		if(data.getDuration().getFrom() != null && data.getDuration().getFrom().getDate() != null) {
-			durationFilter += " and delivery.timecode >= "+data.getDuration().getFrom().getOver();
+			durationFilter += " and delivery.timecode >= "+data.getDuration().getFrom().getDate();
 		}
 		if(data.getDuration().getFrom() != null && data.getDuration().getFrom().getOver() != 0) {
-			durationFilter += " and delivery_over >= "+data.getDuration().getFrom().getOver();
+			durationFilter += " and delivery_number.over >= "+data.getDuration().getFrom().getOver();
 		}
 		if(data.getDuration().getFrom() != null && data.getDuration().getFrom().getOver() != 0 && data.getDuration().getFrom().getBall() != 0) {
-			durationFilter += " or (delivery_over = "+data.getDuration().getFrom().getOver()+" and delivery_ball >= "+data.getDuration().getFrom().getBall()+")";
+			durationFilter += " and (delivery_number.over = "+data.getDuration().getFrom().getOver()+" and delivery_number.ball >= "+data.getDuration().getFrom().getBall()+")";
 		}
 		
 		if(data.getDuration().getTo() != null && data.getDuration().getTo().getDate() != null) {
-			durationFilter += " and delivery.timecode <= "+data.getDuration().getFrom().getOver();
+			durationFilter += " and delivery.timecode <= "+data.getDuration().getTo().getDate();
 		}
 		if(data.getDuration().getTo() != null && data.getDuration().getTo().getOver() != 0) {
-			durationFilter += " and delivery_over <= "+data.getDuration().getFrom().getOver();
+			durationFilter += " and delivery_number.over <= "+data.getDuration().getTo().getOver();
 		}
-		if(data.getDuration().getTo() != null && data.getDuration().getTo().getOver() != 0 && data.getDuration().getFrom().getBall() != 0) {
-			durationFilter += " or (delivery_over = "+data.getDuration().getFrom().getOver()+" and delivery_ball <= "+data.getDuration().getFrom().getBall()+")";
+		if(data.getDuration().getTo() != null && data.getDuration().getTo().getOver() != 0 && data.getDuration().getTo().getBall() != 0) {
+			durationFilter += " and (delivery_number.over = "+data.getDuration().getTo().getOver()+" and delivery_number.ball <= "+data.getDuration().getTo().getBall()+")";
 		}
 		
 		
 		
 		String filtering = "";
-		if(data.getFiltering().getBatsman1() != "") {
+		if(CommonUtil.isNotBlank(data.getFiltering().getBatsman1())) {
 			filtering += " and bsmn.name = :batsman1 ";
 		}
-		if(data.getFiltering().getBatsman2() != "") {
+		if(CommonUtil.isNotBlank(data.getFiltering().getBatsman2())) {
 			filtering += " and bsmn_ptr.name = :batsman2 ";
 		}
-		if(data.getFiltering().getBatsmanTeam()!= "") {
+		if(CommonUtil.isNotBlank(data.getFiltering().getBatsmanTeam())) {
 			filtering += " and ba.name = :batsmanteam ";
 		}
-		if(data.getFiltering().getBowlerName()!= "") {
+		if(CommonUtil.isNotBlank(data.getFiltering().getBowlerName())) {
 			filtering += " and bowler.name = :bowlerName ";
 		}
-		if(data.getFiltering().getBowlerCountry()!= "") {
+		if(CommonUtil.isNotBlank(data.getFiltering().getBowlerCountry())) {
 			filtering += " and bowl_team.name = :bowlerCountry ";
 		}
-		if(data.getFiltering().getScore()!= "") {
+		if(CommonUtil.isNotBlank(data.getFiltering().getScore()) && !"All".equals(data.getFiltering().getScore())) {
 			filtering += " and scoring_info.score = :score ";
 		}
-		if(data.getFiltering().getExtraType()!= "") {
+		if(CommonUtil.isNotBlank(data.getFiltering().getExtraType())) {
 			filtering += " and scoring_info.extras_type = :extraType ";
 		}
-		if(data.getFiltering().getShotAttacked()!= "") {
+		if(CommonUtil.isNotBlank(data.getFiltering().getShotAttacked())) {
 			filtering += " and shot_info.shot_attacked = :shotAttacked ";
 		}
-		if(data.getFiltering().getShotPlayed()!= "") {
+		if(CommonUtil.isNotBlank(data.getFiltering().getShotPlayed())) {
 			filtering += " and shot_info.shot_played = :shotPlayed ";
 		}
-		if(data.getFiltering().getDeliveryType()!= "") {
+		if(CommonUtil.isNotBlank(data.getFiltering().getDeliveryType())) {
 			filtering += " and delivery.delivery_type = :deliveryType ";
 		}
-		if(data.getFiltering().getWicket()!= "") {
+		if(data.getFiltering().isWicket()) {
 			filtering += " and wicket.wicket = :wicket ";
 		}
-		if(data.getFiltering().getLHB_Batsman()!= "") {
-			filtering += " and bsmn.right_handed = :LHBBatsman ";
+		if(data.getFiltering().isLhbBatsman()) {
+			filtering += " and bsmn.right_handed <> :LHBBatsman ";
 		}
-		if(data.getFiltering().getRHB_Batsman()!= "") {
+		if(data.getFiltering().isRhbBatsman()) {
 			filtering += " and bsmn.right_handed =  :RHBBatsman";
 		}
-		Query nativeQuery = entityManager.createQuery(query + durationFilter + filtering);
-		nativeQuery.setParameter("tour_name", data.getDuration().getTournamentName());
-		nativeQuery.setParameter("format", data.getDuration().getTournamentFormat());
-		nativeQuery.setParameter("match_name", data.getDuration().getMatchName());
+		Map inputs=new HashMap<>();
 		
-		if(data.getFiltering().getBatsman1() != "") {
-			nativeQuery.setParameter("batsman1", data.getFiltering().getBatsman1());
-		}
-		if(data.getFiltering().getBatsman2() != "") {
-			nativeQuery.setParameter("batsman2", data.getFiltering().getBatsman2());
-		}
-		if(data.getFiltering().getBatsmanTeam() != "") {
-			nativeQuery.setParameter("batsmanteam", data.getFiltering().getBatsmanTeam());
-		}
-		if(data.getFiltering().getBowlerName() != "") {
-			nativeQuery.setParameter("bowlerName", data.getFiltering().getBowlerName());
-		}
-		if(data.getFiltering().getBowlerCountry() != "") {
-			nativeQuery.setParameter("bowlerCountry", data.getFiltering().getBowlerCountry());
-		}
-		if(data.getFiltering().getScore() != "") {
-			nativeQuery.setParameter("score", data.getFiltering().getScore());
-		}
-		if(data.getFiltering().getExtraType() != "") {
-			nativeQuery.setParameter("extraType", data.getFiltering().getExtraType());
-		}
-		if(data.getFiltering().getShotAttacked() != "") {
-			nativeQuery.setParameter("shotAttacked", data.getFiltering().getShotAttacked());
-		}
-		if(data.getFiltering().getShotPlayed() != "") {
-			nativeQuery.setParameter("shotPlayed", data.getFiltering().getShotPlayed());
-		}
-		if(data.getFiltering().getDeliveryType() != "") {
-			nativeQuery.setParameter("deliveryType", data.getFiltering().getDeliveryType());
-		}
-		if(data.getFiltering().getWicket() != "") {
-			nativeQuery.setParameter("wicket", data.getFiltering().getWicket());
-		}
-		if(data.getFiltering().getLHB_Batsman() != "") {
-			nativeQuery.setParameter("LHBBatsman", data.getFiltering().getLHB_Batsman() == "yes");
-		}
-		if(data.getFiltering().getRHB_Batsman() != "") {
-			nativeQuery.setParameter("RHBBatsman", data.getFiltering().getRHB_Batsman() == "yes");
-		}
-		
-	    List<DataResponse> dbQuerry =  nativeQuery.getResultList();
-	    System.out.println(dbQuerry.size());
-	    //System.out.println(dbQuerry.get(0));
-	    return dbQuerry;
-	    
+		//Query nativeQuery = entityManager.createQuery(query + durationFilter + filtering);
+		inputs.put("tour_name", data.getDuration().getTournamentName());
+		inputs.put("format", data.getDuration().getTournamentFormat());
+		inputs.put("match_name", data.getDuration().getMatchName());
 
+		if(CommonUtil.isNotBlank(data.getFiltering().getBatsman1())) {
+			inputs.put("batsman1", data.getFiltering().getBatsman1());
+		}
+		if(CommonUtil.isNotBlank(data.getFiltering().getBatsman2())) {
+			inputs.put("batsman2", data.getFiltering().getBatsman2());
+		}
+		if(CommonUtil.isNotBlank(data.getFiltering().getBatsmanTeam())) {
+			inputs.put("batsmanteam", data.getFiltering().getBatsmanTeam());
+		}
+		if(CommonUtil.isNotBlank(data.getFiltering().getBowlerName())) {
+			inputs.put("bowlerName", data.getFiltering().getBowlerName());
+		}
+		if(CommonUtil.isNotBlank(data.getFiltering().getBowlerCountry())) {
+			inputs.put("bowlerCountry", data.getFiltering().getBowlerCountry());
+		}
+		if(CommonUtil.isNotBlank(data.getFiltering().getScore()) && !"All".equals(data.getFiltering().getScore())) {
+			inputs.put("score", Integer.parseInt(data.getFiltering().getScore()));
+		}
+		if(CommonUtil.isNotBlank(data.getFiltering().getExtraType())) {
+			inputs.put("extraType", data.getFiltering().getExtraType());
+		}
+		if(CommonUtil.isNotBlank(data.getFiltering().getShotAttacked())) {
+			inputs.put("shotAttacked", data.getFiltering().getShotAttacked());
+		}
+		if(CommonUtil.isNotBlank(data.getFiltering().getShotPlayed() )) {
+			inputs.put("shotPlayed", data.getFiltering().getShotPlayed());
+		}
+		if(CommonUtil.isNotBlank(data.getFiltering().getDeliveryType())) {
+			inputs.put("deliveryType", data.getFiltering().getDeliveryType());
+		}
+		if(CommonUtil.isNotBlank(data.getFiltering().isWicket())) {
+			inputs.put("wicket", data.getFiltering().isWicket());
+		}
+		if(data.getFiltering().isLhbBatsman()) {
+			inputs.put("LHBBatsman", data.getFiltering().isLhbBatsman());
+		}
+		if(data.getFiltering().isRhbBatsman()) {
+			inputs.put("RHBBatsman", data.getFiltering().isRhbBatsman());
+		}
 		
+	    //List<DataResponse> dbQuerry =  nativeQuery.getResultList();
+		List<DataResponse> rows=null;
+		try {
+			System.out.println(query + durationFilter + filtering);
+			rows=namedParameterJdbcTemplate.query(query + durationFilter + filtering, inputs,new ResponseDtoMapper());
+			
+			System.out.println(rows);
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+
+	    return rows;
 	}
 
 }

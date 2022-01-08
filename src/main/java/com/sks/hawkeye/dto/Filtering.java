@@ -19,7 +19,7 @@ public class Filtering {
 	private String shotAttacked ;
 	private String shotPlayed ;
 	private String deliveryType ;
-	private String wicket ;
-	private String RHB_Batsman ;
-	private String LHB_Batsman ;
+	private boolean wicket ;
+	private boolean rhbBatsman ;
+	private boolean lhbBatsman ;
 }

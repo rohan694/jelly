@@ -1,4 +1,7 @@
 package com.sks.hawkeye.response;
+
+import lombok.AllArgsConstructor;
+
 public class ReleasePosition{
 	private double x;
 	private double y;
@@ -22,6 +25,16 @@ public class ReleasePosition{
 	public void setZ(double z) {
 		this.z = z;
 	}
+	public ReleasePosition(double x, double y, double z) {
+		super();
+		this.x = x;
+		this.y = y;
+		this.z = z;
+	}
+	public ReleasePosition() {
+		super();
+	}
     
+	
     
 }
