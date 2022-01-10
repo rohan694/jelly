@@ -72,21 +72,20 @@ public class DataServiceImpl implements DataService {
 		if(data.getDuration().getFrom() != null && data.getDuration().getFrom().getDate() != null) {
 			durationFilter += " and delivery.timecode >= "+data.getDuration().getFrom().getDate();
 		}
-		if(data.getDuration().getFrom() != null && data.getDuration().getFrom().getOver() != 0) {
-			durationFilter += " and delivery_number.over >= "+data.getDuration().getFrom().getOver();
-		}
 		if(data.getDuration().getFrom() != null && data.getDuration().getFrom().getOver() != 0 && data.getDuration().getFrom().getBall() != 0) {
-			durationFilter += " and (delivery_number.over = "+data.getDuration().getFrom().getOver()+" and delivery_number.ball >= "+data.getDuration().getFrom().getBall()+")";
+			durationFilter +=  " and (delivery_number.over > "+data.getDuration().getFrom().getOver()+" or (delivery_number.over = "+data.getDuration().getFrom().getOver()+" and delivery_number.ball >= "+data.getDuration().getFrom().getBall()+"))";
+		} else if(data.getDuration().getFrom() != null && data.getDuration().getFrom().getOver() != 0) {
+			durationFilter += " and delivery_number.over >= "+data.getDuration().getFrom().getOver();
 		}
 		
 		if(data.getDuration().getTo() != null && data.getDuration().getTo().getDate() != null) {
 			durationFilter += " and delivery.timecode <= "+data.getDuration().getTo().getDate();
 		}
-		if(data.getDuration().getTo() != null && data.getDuration().getTo().getOver() != 0) {
-			durationFilter += " and delivery_number.over <= "+data.getDuration().getTo().getOver();
-		}
+
 		if(data.getDuration().getTo() != null && data.getDuration().getTo().getOver() != 0 && data.getDuration().getTo().getBall() != 0) {
-			durationFilter += " and (delivery_number.over = "+data.getDuration().getTo().getOver()+" and delivery_number.ball <= "+data.getDuration().getTo().getBall()+")";
+			durationFilter += " and (delivery_number.over < "+data.getDuration().getTo().getOver() +" or (delivery_number.over = "+data.getDuration().getTo().getOver()+" and delivery_number.ball <= "+data.getDuration().getTo().getBall()+"))";
+		} else if(data.getDuration().getTo() != null && data.getDuration().getTo().getOver() != 0) {
+			durationFilter += " and delivery_number.over <= "+data.getDuration().getTo().getOver();
 		}
 		
 		
