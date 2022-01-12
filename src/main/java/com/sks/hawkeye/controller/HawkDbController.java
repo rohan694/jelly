@@ -26,7 +26,6 @@ import com.sks.hawkeye.service.FileDbStorageService;
 
 @Controller
 @RequestMapping("/db")
-@CrossOrigin("http://localhost:8080")
 public class HawkDbController {
 	@Autowired
 	private FileDbStorageService storageService;

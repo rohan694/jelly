@@ -25,7 +25,6 @@ import com.sks.hawkeye.service.DataService;
 
 @RestController
 @RequestMapping("/data")
-@CrossOrigin("http://localhost:8080")
 public class DataController {
 
 	@Autowired

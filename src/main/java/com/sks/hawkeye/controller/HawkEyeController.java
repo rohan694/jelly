@@ -12,7 +12,6 @@ import com.sks.hawkeye.service.GameSnapService;
 
 @RestController
 @RequestMapping("/hawk")
-@CrossOrigin("http://localhost:8080")
 public class HawkEyeController {
 	
 	@Autowired
