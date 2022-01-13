@@ -19,6 +19,7 @@ public class ResponseDtoMapper implements RowMapper<DataResponse> {
 			dto.setBattingTeamName(rs.getString("battingteamname"));
 			dto.setBatsman1(rs.getString("batsman1"));
 			dto.setBatsman1RightHanded(rs.getBoolean("batsman1righthanded"));
+			dto.setRightHandedBowler(rs.getBoolean("isBowlerRightHanded"));
 			dto.setBatsman2(rs.getString("batsman2"));
 			dto.setBatsman2RightHand(rs.getBoolean("batsman2righthand"));
 			dto.setBowlingTeamName(rs.getString("bowlingteamname"));
@@ -32,11 +33,11 @@ public class ResponseDtoMapper implements RowMapper<DataResponse> {
 			dto.setIsWicket(rs.getBoolean("iswicket"));
 			dto.setShotAttacked(rs.getString("shotattacked"));
 			dto.setShotPlayed(rs.getString("shotplayed"));
-			//dto.setReleaseSpeed(rs.getString(rowNum));
-			dto.setReleasePosition(new ReleasePosition(rs.getInt("release_position_x"),rs.getInt("release_position_y"),rs.getInt("release_position_x")));
-			dto.setBouncePosition(new ReleasePosition(rs.getInt("bounce_position_x"),rs.getInt("bounce_position_y"),rs.getInt("bounce_position_z")));
-			dto.setStumpPosition(new ReleasePosition(rs.getInt("stump_position_x"),rs.getInt("stump_position_y"),rs.getInt("stump_position_z")));
-			dto.setLandingPosition(new ReleasePosition(rs.getInt("landing_position_x"),rs.getInt("landing_position_y"),rs.getInt("landing_position_z")));
+			dto.setReleaseSpeed(rs.getDouble("release_speed"));
+			dto.setReleasePosition(new ReleasePosition(rs.getDouble("release_position_x"),rs.getDouble("release_position_y"),rs.getDouble("release_position_x")));
+			dto.setBouncePosition(new ReleasePosition(rs.getDouble("bounce_position_x"),rs.getDouble("bounce_position_y"),rs.getDouble("bounce_position_z")));
+			dto.setStumpPosition(new ReleasePosition(rs.getDouble("stump_position_x"),rs.getDouble("stump_position_y"),rs.getDouble("stump_position_z")));
+			dto.setLandingPosition(new ReleasePosition(rs.getDouble("landing_position_x"),rs.getDouble("landing_position_y"),rs.getDouble("landing_position_z")));
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

@@ -15,6 +15,7 @@ public class DurationDto {
 	private MatchSpecificInstance to;
 	private MatchSpecificInstance from;
 	
-	
+    public int innings;
+
 	
 }

@@ -35,11 +35,12 @@ public class DataServiceImpl implements DataService {
 		String query = "select bsmn.name as batsman1, bsmn.right_handed as batsman1RightHanded, bsmn_ptr.name as batsman2, "
 				+ "bsmn_ptr.right_handed as batsman2RightHand, bowl_team.name as bowlingTeamName, "
 				+ "bowler.name as bowlerName, "
+				+ "bowler.right_handed as isBowlerRightHanded, "
 				+ "delivery.delivery_type as deliverytype,  "
 				+ "delivery_number.ball as ball, "
 				+ "delivery_number.over as over , scoring_info.extras_score as extraScore,  "
 				+ "scoring_info.extras_type as extraType, scoring_info.score as score,  "
-				+ "wicket.wicket as IsWicket,  "
+				+ "wicket.wicket as IsWicket, trajectory.release_speed as release_speed,"
 				+ "release_position.x as release_position_x, release_position.y as release_position_y, "
 				+ "release_position.z as release_position_z, bounce_position.x as bounce_position_x, "
 				+ "bounce_position.y as bounce_position_y, bounce_position.z as bounce_position_z, "
@@ -67,8 +68,14 @@ public class DataServiceImpl implements DataService {
 				+ "INNER JOIN bounce_position ON bounce_position.trajectory_id = trajectory.id "
 				+ "INNER JOIN stump_position ON stump_position.trajectory_id = trajectory.id "
 				+ "INNER JOIN landing_position ON landing_position.trajectory_id = trajectory.id "
-				+ "where tour_name = :tour_name and format = :format and ma.name = :match_name";
+				+ "where tour_name = :tour_name ";
 		String durationFilter = "";
+		if(CommonUtil.isNotBlank(data.getDuration().getTournamentFormat())) {
+			durationFilter += " and format = :format";
+		}
+		if(CommonUtil.isNotBlank(data.getDuration().getMatchName())) {
+			durationFilter += " and ma.name = :match_name";
+		}
 		if(data.getDuration().getFrom() != null && data.getDuration().getFrom().getDate() != null) {
 			durationFilter += " and delivery.timecode >= "+data.getDuration().getFrom().getDate();
 		}
@@ -124,19 +131,22 @@ public class DataServiceImpl implements DataService {
 		if(data.getFiltering().isWicket()) {
 			filtering += " and wicket.wicket = :wicket ";
 		}
-		if(data.getFiltering().isLhbBatsman()) {
-			filtering += " and bsmn.right_handed <> :LHBBatsman ";
+		if(data.getFiltering().getIsRightHandedBatsman().isPresent()) {
+			filtering += " and bsmn.right_handed = :isRightHandedBatsman ";
 		}
-		if(data.getFiltering().isRhbBatsman()) {
-			filtering += " and bsmn.right_handed =  :RHBBatsman";
+		if(data.getFiltering().getIsRightHandedBowler().isPresent()) {
+			filtering += " and bowler.right_handed =  :isRightHandedBowler";
 		}
 		Map inputs=new HashMap<>();
 		
 		//Query nativeQuery = entityManager.createQuery(query + durationFilter + filtering);
 		inputs.put("tour_name", data.getDuration().getTournamentName());
-		inputs.put("format", data.getDuration().getTournamentFormat());
-		inputs.put("match_name", data.getDuration().getMatchName());
-
+		if(CommonUtil.isNotBlank(data.getDuration().getTournamentFormat())) {
+			inputs.put("format", data.getDuration().getTournamentFormat());
+		}
+		if(CommonUtil.isNotBlank(data.getDuration().getMatchName())) {
+			inputs.put("match_name", data.getDuration().getMatchName());
+		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getBatsman1())) {
 			inputs.put("batsman1", data.getFiltering().getBatsman1());
 		}
@@ -170,11 +180,11 @@ public class DataServiceImpl implements DataService {
 		if(CommonUtil.isNotBlank(data.getFiltering().isWicket())) {
 			inputs.put("wicket", data.getFiltering().isWicket());
 		}
-		if(data.getFiltering().isLhbBatsman()) {
-			inputs.put("LHBBatsman", data.getFiltering().isLhbBatsman());
+		if(data.getFiltering().getIsRightHandedBatsman().isPresent()) {
+			inputs.put("isRightHandedBatsman", data.getFiltering().getIsRightHandedBatsman().get());
 		}
-		if(data.getFiltering().isRhbBatsman()) {
-			inputs.put("RHBBatsman", data.getFiltering().isRhbBatsman());
+		if(data.getFiltering().getIsRightHandedBowler().isPresent()) {
+			inputs.put("isRightHandedBowler", data.getFiltering().getIsRightHandedBowler().get());
 		}
 		
 	    //List<DataResponse> dbQuerry =  nativeQuery.getResultList();
