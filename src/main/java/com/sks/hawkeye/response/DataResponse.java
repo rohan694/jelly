@@ -26,13 +26,11 @@ public class DataResponse {
 	private boolean IsWicket;
 	private String shotAttacked;
 	private String shotPlayed;
-	private String releaseSpeed;
+	private double releaseSpeed;
 	private ReleasePosition releasePosition;
 	private ReleasePosition bouncePosition;
 	private ReleasePosition stumpPosition;
 	private ReleasePosition landingPosition;
-	
-	
-	
+	private boolean isRightHandedBowler;
 	
 }

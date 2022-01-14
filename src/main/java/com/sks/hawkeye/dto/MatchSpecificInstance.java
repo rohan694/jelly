@@ -10,6 +10,6 @@ public class MatchSpecificInstance {
 	private String date;
 	private int over;
 	private int ball;
-	
+	private int inning;
 	
 }

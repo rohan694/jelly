@@ -1,5 +1,7 @@
 package com.sks.hawkeye.dto;
 
+import java.util.Optional;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -20,6 +22,8 @@ public class Filtering {
 	private String shotPlayed ;
 	private String deliveryType ;
 	private boolean wicket ;
-	private boolean rhbBatsman ;
-	private boolean lhbBatsman ;
+	//private boolean rhbBatsman ;
+	//private boolean lhbBatsman ;
+	private Optional<Boolean> isRightHandedBatsman;
+	private Optional<Boolean> isRightHandedBowler;
 }
