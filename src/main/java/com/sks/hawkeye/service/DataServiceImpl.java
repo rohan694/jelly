@@ -84,7 +84,12 @@ public class DataServiceImpl implements DataService {
 		} else if(data.getDuration().getFrom() != null && data.getDuration().getFrom().getOver() != 0) {
 			durationFilter += " and delivery_number.over >= "+data.getDuration().getFrom().getOver();
 		}
-		
+		if(data.getDuration().getFrom() != null && data.getDuration().getFrom().getInning() != 0) {
+			durationFilter +=  " and delivery_number.innings >= "+data.getDuration().getFrom().getInning();
+		}
+		if(data.getDuration().getTo() != null && data.getDuration().getTo().getInning() != 0) {
+			durationFilter +=  " and delivery_number.innings <= "+data.getDuration().getTo().getInning();
+		}
 		if(data.getDuration().getTo() != null && data.getDuration().getTo().getDate() != null) {
 			durationFilter += " and delivery.timecode <= "+data.getDuration().getTo().getDate();
 		}
