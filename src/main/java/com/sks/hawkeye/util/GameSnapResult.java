@@ -10,6 +10,19 @@ public class GameSnapResult {
 	public static TourSnapShotRes prepare(TourSnapShotEntity tourSnap) {
 		return _instance.prepareGameSnapShot(tourSnap);
 	}
+	
+	public static BattingTeam  prepareBattingTeam(BattingTeamEntity battingTeam) {
+		return _instance.prepare(battingTeam);
+	}
+	
+	public static BowlingTeam  prepareBowlingTeam(BowlingTeamEntity bowlingTeam) {
+		return _instance.prepare(bowlingTeam);
+	}
+	
+	public static Match prepareMatch(MatchEntity matchEntity) {
+		return _instance.prepare(matchEntity);
+	}
+	
 
 	private TourSnapShotRes prepareGameSnapShot(TourSnapShotEntity tourSnap) {
 		TourSnapShotRes tss = new TourSnapShotRes();
@@ -28,8 +41,14 @@ public class GameSnapResult {
 	private Match prepare(MatchEntity m) {
 		Match me = new Match();
 		me.setName(m.getName());
-		me.setBattingTeam(prepare(m.getBattingTeam()));
-		me.setBowlingTeam(prepare(m.getBowlingTeam()));
+//		me.addBattingTeam(prepare(m.getBattingTeam()));
+//		me.addBowlingTeam(prepare(m.getBowlingTeam()));
+		for(BattingTeamEntity bte : m.getBattingTeam()) {
+			me.addBattingTeam(prepare(bte));
+		}
+		for(BowlingTeamEntity bwte : m.getBowlingTeam()) {
+			me.addBowlingTeam(prepare(bwte));
+		}
 		for (DeliveryEntity de : m.getListDelivery()) {
 			me.addDelivery(prepare(de));
 		}

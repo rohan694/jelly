@@ -10,6 +10,9 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import lombok.ToString;
+
+@ToString
 @Entity
 @Table(name = "TourSnapShot")
 public class TourSnapShotEntity {

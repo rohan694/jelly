@@ -7,6 +7,9 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import lombok.ToString;
+
+@ToString
 @Entity
 @Table(name = "Batsman")
 public class BatsmanEntity {
@@ -44,12 +47,12 @@ public class BatsmanEntity {
 	public void setId(String id) {
 		this.id = id;
 	}
-	public BattingTeamEntity getBattingTeam() {
-		return battingTeam;
-	}
-	public void setBattingTeam(BattingTeamEntity battingTeam) {
-		this.battingTeam = battingTeam;
-	}
+
+	/*
+	 * public BattingTeamEntity getBattingTeam() { return battingTeam; } public void
+	 * setBattingTeam(BattingTeamEntity battingTeam) { this.battingTeam =
+	 * battingTeam; }
+	 */
 	public long getPid() {
 		return pid;
 	}

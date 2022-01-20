@@ -1,4 +1,8 @@
 package com.sks.hawkeye.dto;
+
+import lombok.ToString;
+
+@ToString
 public class Match{
     public BattingTeam battingTeam;
     public BowlingTeam bowlingTeam;

@@ -16,6 +16,9 @@ import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
+import lombok.ToString;
+
+@ToString
 @Entity
 @Table(name = "Match")
 public class MatchEntity {
@@ -25,12 +28,12 @@ public class MatchEntity {
 	
 	public String name;
 	
-	@OneToOne(mappedBy = "match", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "match", cascade = CascadeType.ALL)
 	@PrimaryKeyJoinColumn
-	public BattingTeamEntity battingTeam;
-	@OneToOne(mappedBy = "match", cascade = CascadeType.ALL)
+	public Set<BattingTeamEntity> battingTeam = new HashSet<BattingTeamEntity>();
+	@OneToMany(mappedBy = "match", cascade = CascadeType.ALL)
 	@PrimaryKeyJoinColumn
-	public BowlingTeamEntity bowlingTeam;
+	public Set<BowlingTeamEntity> bowlingTeam = new HashSet<BowlingTeamEntity>();
 	
 	@OneToMany(mappedBy = "match", cascade = CascadeType.ALL)	//@PrimaryKeyJoinColumn
 	private Set<DeliveryEntity> listDelivery  = new HashSet<>();
@@ -47,19 +50,19 @@ public class MatchEntity {
 		this.gameSnapShot = gameSnapShot;
 	}
 
-	public BattingTeamEntity getBattingTeam() {
+	public Set<BattingTeamEntity> getBattingTeam() {
 		return battingTeam;
 	}
 
-	public void setBattingTeam(BattingTeamEntity battingTeam) {
+	public void setBattingTeam(Set<BattingTeamEntity> battingTeam) {
 		this.battingTeam = battingTeam;
 	}
 
-	public BowlingTeamEntity getBowlingTeam() {
+	public Set<BowlingTeamEntity> getBowlingTeam() {
 		return bowlingTeam;
 	}
 
-	public void setBowlingTeam(BowlingTeamEntity bowlingTeam) {
+	public void setBowlingTeam(Set<BowlingTeamEntity> bowlingTeam) {
 		this.bowlingTeam = bowlingTeam;
 	}
 
@@ -96,6 +99,33 @@ public class MatchEntity {
 		delivery.setMatch(this);
 		this.listDelivery.add(delivery);
 	}
+	public void addBatsmanEntity(BattingTeamEntity batting) {
+		batting.setMatch(this);
+		this.battingTeam.add(batting);
+	}
+	public void addBowlingEntity(BowlingTeamEntity bowling) {
+		bowling.setMatch(this);
+		this.bowlingTeam.add(bowling);
+	}
+	
+	public void addBatsmanEntities(Set<BattingTeamEntity> listBatsmanEntity) {
+		if (listBatsmanEntity != null) {
+			for(BattingTeamEntity be : listBatsmanEntity) {
+				be.setMatch(this);
+				this.battingTeam.add(be);
+			}
+		}
+	}
+	
+	public void addBowlerEntities(Set<BowlingTeamEntity> listBowlerEntity) {
+		if (listBowlerEntity != null) {
+			for(BowlingTeamEntity be : listBowlerEntity) {
+				be.setMatch(this);
+				this.bowlingTeam.add(be);
+			}
+		}
+	}
+
 
 	public void addDeliveries(Set<DeliveryEntity> listDelivery) {
 		if (listDelivery != null) {

@@ -7,6 +7,9 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import lombok.ToString;
+
+@ToString
 @Entity
 @Table(name = "BowlerPartner")
 public class BowlerPartnerEntity {

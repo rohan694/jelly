@@ -54,14 +54,45 @@ public class GameSnapUtil {
 		return _instance.prepareGameSnapShotEntity(tourSnapShot);
 	}
 	
-	public static TourSnapShotEntity prepare(TourSnapShotEntity tse, TourSnapShot tourSnapShot) {
-		TourSnapShotEntity newTse =  _instance.prepareGameSnapShotEntity(tourSnapShot);
+	public static TourSnapShotEntity prepare(TourSnapShotEntity tse, MatchEntity mte, BattingTeamEntity bte, BowlingTeamEntity bwte, TourSnapShot tourSnapShot) {
+
 		if(tse != null) {
-			MatchEntity match = tse.getMatch(tourSnapShot.getMatchName());
-			match.addDeliveries(newTse.getMatch(tourSnapShot.getMatchName()).getListDelivery());
+			System.out.println("tse ==> "+ tse.toString() );
+
+			if(mte != null) {
+				System.out.println("mte ==> "+ mte.toString() );
+
+				if(bte == null) {
+					System.out.println("bte ==> "+ tse.toString() );
+
+					tse.getMatch(tourSnapShot.getMatchName()).addBatsmanEntity(_instance.prepare(tse.getMatch(tourSnapShot.getMatchName()), tourSnapShot.getMatch().getBattingTeam()));
+				} 
+				if(bwte == null) {
+					System.out.println("bwte ==> null ");
+
+					tse.getMatch(tourSnapShot.getMatchName()).addBowlingEntity(_instance.prepare(tse.getMatch(tourSnapShot.getMatchName()), tourSnapShot.getMatch().getBowlingTeam()));
+				} 
+			} else {
+				System.out.println("mte ==> null ");
+				MatchEntity mae = _instance.prepare(tse, tourSnapShot.getMatch());
+				if(bte == null) {
+					System.out.println("bte ==> "+ tse.toString() );
+
+					mae.addBatsmanEntity(_instance.prepare(tse.getMatch(tourSnapShot.getMatchName()), tourSnapShot.getMatch().getBattingTeam()));
+				} 
+				if(bwte == null) {
+					System.out.println("bwte ==> null ");
+
+					mae.addBowlingEntity(_instance.prepare(tse.getMatch(tourSnapShot.getMatchName()), tourSnapShot.getMatch().getBowlingTeam()));
+				} 
+				tse.addMatch(mae);
+			}
+			System.out.println("tse save ===> "+tse.toString());
+			tse.getMatch(tourSnapShot.getMatchName()).addDelivery(_instance.prepare(mte, tourSnapShot.getMatch().getDelivery()));
+
 			return tse;
 		}
-		return newTse;
+		return _instance.prepareGameSnapShotEntity(tourSnapShot);
 	}
 	
 	private TourSnapShotEntity prepareGameSnapShotEntity(TourSnapShot tss) {
@@ -77,8 +108,8 @@ public class GameSnapUtil {
 	private MatchEntity prepare(TourSnapShotEntity gsse,Match m) {
 		MatchEntity me = new MatchEntity(gsse);
 		me.setName(m.getName());
-		me.setBattingTeam(prepare(me, m.getBattingTeam()));
-		me.setBowlingTeam(prepare(me, m.getBowlingTeam()));
+		me.addBatsmanEntity(prepare(me, m.getBattingTeam()));
+		me.addBowlingEntity(prepare(me, m.getBowlingTeam()));
 		me.addDelivery(prepare(me, m.getDelivery()));
 		return me;
 	}	

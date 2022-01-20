@@ -1,14 +1,21 @@
 package com.sks.hawkeye.model.gameSnap;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
+import lombok.ToString;
+
+@ToString
 @Entity
 @Table(name = "BattingTeam")
 public class BattingTeamEntity {
@@ -16,9 +23,10 @@ public class BattingTeamEntity {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long pid;
 	
-	private String id;
+	private String battingTeamId;
 	
-	@OneToOne
+    @ManyToOne(optional = false,fetch = FetchType.LAZY)
+    @JoinColumn(name = "matchId")
 	private MatchEntity match;
     public boolean home;
     
@@ -60,10 +68,10 @@ public class BattingTeamEntity {
 		this.name = name;
 	}
 	public String getId() {
-		return id;
+		return battingTeamId;
 	}
 	public void setId(String id) {
-		this.id = id;
+		this.battingTeamId = id;
 	}
 	public MatchEntity getMatch() {
 		return match;

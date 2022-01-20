@@ -2,20 +2,34 @@ package com.sks.hawkeye.model.gameSnap;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
+import lombok.ToString;
+
+@ToString
 @Entity
 @Table(name = "BowlingTeam")
 public class BowlingTeamEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private long id;
-	@OneToOne
+	private long pid;
+	public long getPid() {
+		return pid;
+	}
+	public void setPid(long pid) {
+		this.pid = pid;
+	}
+	private String bowlingTeamId;
+    @ManyToOne(optional = false,fetch = FetchType.LAZY)
+    @JoinColumn(name = "matchId")
 	private MatchEntity match;
 	public boolean home;
 	public String name;
@@ -56,11 +70,11 @@ public class BowlingTeamEntity {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public long getId() {
-		return id;
+	public String getId() {
+		return bowlingTeamId;
 	}
-	public void setId(long id) {
-		this.id = id;
+	public void setId(String id) {
+		this.bowlingTeamId = id;
 	}
 	public MatchEntity getMatch() {
 		return match;

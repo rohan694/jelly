@@ -5,21 +5,31 @@ import java.util.Set;
 
 
 public class Match{
-    public BattingTeam battingTeam;
-    public BowlingTeam bowlingTeam;
+    public Set<BattingTeam> battingTeam;
+    public Set<BowlingTeam> bowlingTeam;
     private Set<Delivery> listDelivery  = new HashSet<>();
     public String name;
-	public BattingTeam getBattingTeam() {
+	
+	
+	public Set<BattingTeam> getBattingTeam() {
 		return battingTeam;
 	}
-	public void setBattingTeam(BattingTeam battingTeam) {
+	public void setBattingTeam(Set<BattingTeam> battingTeam) {
 		this.battingTeam = battingTeam;
 	}
-	public BowlingTeam getBowlingTeam() {
+	public Set<BowlingTeam> getBowlingTeam() {
 		return bowlingTeam;
 	}
-	public void setBowlingTeam(BowlingTeam bowlingTeam) {
+	public void setBowlingTeam(Set<BowlingTeam> bowlingTeam) {
 		this.bowlingTeam = bowlingTeam;
+	}
+	
+	public void addBattingTeam(BattingTeam battingTeam) {
+		this.battingTeam.add(battingTeam);
+	}
+	
+	public void addBowlingTeam(BowlingTeam bowlingTeam) {
+		this.bowlingTeam.add(bowlingTeam);
 	}
 	
 	public String getName() {
