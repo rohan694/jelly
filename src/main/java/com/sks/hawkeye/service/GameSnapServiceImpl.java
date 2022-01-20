@@ -54,26 +54,13 @@ public class GameSnapServiceImpl implements GameSnapService {
 			try {
 				InputStream inputStream = new ByteArrayInputStream(fileDb.getData());
 				TourSnapShot ts = mapper.readValue(inputStream, new TypeReference<TourSnapShot>() {});
-				System.out.println("ts ==>  "+ts.toString());
-				System.out.println(ts.getTourName());
-				System.out.println(ts.getMatchName());
 				TourSnapShotEntity tse = gameSnapRepository.getByTourName(ts.getTourName());
-				if(tse != null )
-				System.out.println("tse ===> "+tse.toString());
-
 				MatchEntity mte = matchRepo.getByName(ts.getMatchName());
-				if (mte != null)
-				System.out.println("mte ===> "+mte.toString());
+				
 				
 				BowlingTeamEntity bwte = bowlingTeamRepo.getByBowlingTeamId(ts.getMatch().getBowlingTeam().getId());
-				if(bwte != null)
-				System.out.println("bwte ===> "+bwte.toString());
 				
 				BattingTeamEntity bte = batsmanTeamRepo.getByBattingTeamId(ts.getMatch().getBattingTeam().getId());
-				if (bte != null)
-				System.out.println("bte ===> "+bte.toString());
-
-
 
 				tse = GameSnapUtil.prepare(tse, mte, bte, bwte, ts);
 				gameSnapRepository.save(tse);
