@@ -1,5 +1,7 @@
 package com.sks.hawkeye.dto;
 
+import java.math.BigInteger;
+
 import lombok.ToString;
 
 @ToString
@@ -7,7 +9,7 @@ public class BattingTeam{
     public Batsman batsman;
     public BatsmanPartner batsmanPartner;
     public boolean home;
-    public String id;
+    public BigInteger id;
     public String name;
     
 	public Batsman getBatsman() {
@@ -28,10 +30,10 @@ public class BattingTeam{
 	public void setHome(boolean home) {
 		this.home = home;
 	}
-	public String getId() {
+	public BigInteger getId() {
 		return id;
 	}
-	public void setId(String id) {
+	public void setId(BigInteger id) {
 		this.id = id;
 	}
 	public String getName() {

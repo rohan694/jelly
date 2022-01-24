@@ -45,10 +45,42 @@ public class DeliveryEntity{
     @OneToOne(mappedBy = "delivery", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     public TrajectoryEntity trajectory;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "batsman_id", referencedColumnName = "playerId")
+    public PlayerEntity batsman;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "batsman_partner_id", referencedColumnName = "playerId")
+    public PlayerEntity batsmanPartner;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "bowler_id", referencedColumnName = "playerId")
+    public PlayerEntity bowler;
     
     public DeliveryEntity() {}
 	public DeliveryEntity(MatchEntity match) {
 		this.match = match;
+	}
+	
+	
+	public PlayerEntity getBatsman() {
+		return batsman;
+	}
+	public void setBatsman(PlayerEntity batsman) {
+		this.batsman = batsman;
+	}
+	public PlayerEntity getBatsmanPartner() {
+		return batsmanPartner;
+	}
+	public void setBatsmanPartner(PlayerEntity batsmanPartner) {
+		this.batsmanPartner = batsmanPartner;
+	}
+	public PlayerEntity getBowler() {
+		return bowler;
+	}
+	public void setBowler(PlayerEntity bowler) {
+		this.bowler = bowler;
 	}
 	public AdditionalEventInfoEntity getAdditionalEventInformation() {
 		return additionalEventInformation;

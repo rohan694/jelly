@@ -2,7 +2,6 @@ package com.sks.hawkeye.dto;
 
 import lombok.ToString;
 
-@ToString
 public class TourSnapShot{
     public String country;
     public String format;

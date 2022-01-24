@@ -10,11 +10,16 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import lombok.ToString;
 
@@ -28,16 +33,16 @@ public class MatchEntity {
 	
 	public String name;
 	
-	@OneToMany(mappedBy = "match", cascade = CascadeType.ALL)
-	@PrimaryKeyJoinColumn
-	public Set<BattingTeamEntity> battingTeam = new HashSet<BattingTeamEntity>();
-	@OneToMany(mappedBy = "match", cascade = CascadeType.ALL)
-	@PrimaryKeyJoinColumn
-	public Set<BowlingTeamEntity> bowlingTeam = new HashSet<BowlingTeamEntity>();
-	
+	@ManyToMany(cascade = CascadeType.ALL)
+	@JoinTable(
+			  name = "match_team_mapping", 
+			  joinColumns = @JoinColumn(name = "id"), 
+			  inverseJoinColumns = @JoinColumn(name = "teamName"))
+	@NotFound(action = NotFoundAction.IGNORE)
+	public Set<TeamEntity> participatingTeams = new HashSet<TeamEntity>();
+
 	@OneToMany(mappedBy = "match", cascade = CascadeType.ALL)	//@PrimaryKeyJoinColumn
 	private Set<DeliveryEntity> listDelivery  = new HashSet<>();
-	
 	
 	@ManyToOne(optional = false,fetch = FetchType.LAZY)
     @JoinColumn(name = "tourId")
@@ -48,22 +53,6 @@ public class MatchEntity {
 	public MatchEntity() {	}	
 	public MatchEntity(TourSnapShotEntity gameSnapShot) {
 		this.gameSnapShot = gameSnapShot;
-	}
-
-	public Set<BattingTeamEntity> getBattingTeam() {
-		return battingTeam;
-	}
-
-	public void setBattingTeam(Set<BattingTeamEntity> battingTeam) {
-		this.battingTeam = battingTeam;
-	}
-
-	public Set<BowlingTeamEntity> getBowlingTeam() {
-		return bowlingTeam;
-	}
-
-	public void setBowlingTeam(Set<BowlingTeamEntity> bowlingTeam) {
-		this.bowlingTeam = bowlingTeam;
 	}
 
 	public String getName() {
@@ -99,33 +88,10 @@ public class MatchEntity {
 		delivery.setMatch(this);
 		this.listDelivery.add(delivery);
 	}
-	public void addBatsmanEntity(BattingTeamEntity batting) {
-		batting.setMatch(this);
-		this.battingTeam.add(batting);
+	public void addParticipatingTeams(TeamEntity team) {
+		team.addMatch(this);
+		this.participatingTeams.add(team);
 	}
-	public void addBowlingEntity(BowlingTeamEntity bowling) {
-		bowling.setMatch(this);
-		this.bowlingTeam.add(bowling);
-	}
-	
-	public void addBatsmanEntities(Set<BattingTeamEntity> listBatsmanEntity) {
-		if (listBatsmanEntity != null) {
-			for(BattingTeamEntity be : listBatsmanEntity) {
-				be.setMatch(this);
-				this.battingTeam.add(be);
-			}
-		}
-	}
-	
-	public void addBowlerEntities(Set<BowlingTeamEntity> listBowlerEntity) {
-		if (listBowlerEntity != null) {
-			for(BowlingTeamEntity be : listBowlerEntity) {
-				be.setMatch(this);
-				this.bowlingTeam.add(be);
-			}
-		}
-	}
-
 
 	public void addDeliveries(Set<DeliveryEntity> listDelivery) {
 		if (listDelivery != null) {

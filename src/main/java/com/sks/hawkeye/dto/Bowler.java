@@ -1,18 +1,20 @@
 package com.sks.hawkeye.dto;
 
+import java.math.BigInteger;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Bowler{
-    private String id;
+    private BigInteger id;
     @JsonProperty("isRightHanded") 
     private boolean rightHanded;
     private String name;
     private int spell;
     
-	public String getId() {
+	public BigInteger getId() {
 		return id;
 	}
-	public void setId(String id) {
+	public void setId(BigInteger id) {
 		this.id = id;
 	}
 	

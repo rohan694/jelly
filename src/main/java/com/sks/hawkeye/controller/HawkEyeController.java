@@ -17,9 +17,11 @@ public class HawkEyeController {
 	@Autowired
 	private GameSnapService gameSnapService;
 
-
-	@GetMapping("/files/{tourName}")
-	public TourSnapShotRes getTourSnapShot(@PathVariable String tourName) {
-		return gameSnapService.getTourSnapShot(tourName);
-	}
+	/*
+	 * @GetMapping("/files/{tourName}") public TourSnapShotRes
+	 * getTourSnapShot(@PathVariable String tourName) { return
+	 * gameSnapService.getTourSnapShot(tourName); }
+	 */
+	
+	
 }

@@ -1,5 +1,11 @@
 package com.sks.hawkeye.util;
 
+import java.util.function.Supplier;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+
 import com.sks.hawkeye.dto.AdditionalEventInformation;
 import com.sks.hawkeye.dto.BatStatPosition;
 import com.sks.hawkeye.dto.Batsman;
@@ -25,13 +31,9 @@ import com.sks.hawkeye.dto.Trajectory;
 import com.sks.hawkeye.dto.Wicket;
 import com.sks.hawkeye.model.gameSnap.AdditionalEventInfoEntity;
 import com.sks.hawkeye.model.gameSnap.BatStatPositionEntity;
-import com.sks.hawkeye.model.gameSnap.BatsmanEntity;
-import com.sks.hawkeye.model.gameSnap.BatsmanPartnerEntity;
-import com.sks.hawkeye.model.gameSnap.BattingTeamEntity;
+import com.sks.hawkeye.model.gameSnap.PlayerEntity;
+import com.sks.hawkeye.model.gameSnap.TeamEntity;
 import com.sks.hawkeye.model.gameSnap.BouncePositionEntity;
-import com.sks.hawkeye.model.gameSnap.BowlerEntity;
-import com.sks.hawkeye.model.gameSnap.BowlerPartnerEntity;
-import com.sks.hawkeye.model.gameSnap.BowlingTeamEntity;
 import com.sks.hawkeye.model.gameSnap.CreasePositionEntity;
 import com.sks.hawkeye.model.gameSnap.DeliveryEntity;
 import com.sks.hawkeye.model.gameSnap.DeliveryNumberEntity;
@@ -44,64 +46,40 @@ import com.sks.hawkeye.model.gameSnap.ReleasePositionEntity;
 import com.sks.hawkeye.model.gameSnap.ScoringInfoEntity;
 import com.sks.hawkeye.model.gameSnap.ShotInfoEntity;
 import com.sks.hawkeye.model.gameSnap.StumpPositionEntity;
+import com.sks.hawkeye.model.gameSnap.TeamEntity;
 import com.sks.hawkeye.model.gameSnap.TrajectoryEntity;
 import com.sks.hawkeye.model.gameSnap.WicketEntity;
+import com.sks.hawkeye.repository.GameSnapRepository;
+import com.sks.hawkeye.repository.MatchRepository;
+import com.sks.hawkeye.repository.PlayerRepository;
+import com.sks.hawkeye.repository.TeamRepository;
+import com.sks.hawkeye.response.TourSnapShotRes;
 
+@Service 
 public class GameSnapUtil {
-	private static GameSnapUtil _instance = new GameSnapUtil();
 	
-	public static TourSnapShotEntity prepare(TourSnapShot tourSnapShot) {
-		return _instance.prepareGameSnapShotEntity(tourSnapShot);
+	public TourSnapShotEntity prepare(TourSnapShot tourSnapShot) {
+		return prepareGameSnapShotEntity(tourSnapShot);
 	}
-	
-	public static TourSnapShotEntity prepare(TourSnapShotEntity tse, MatchEntity mte, BattingTeamEntity bte, BowlingTeamEntity bwte, TourSnapShot tourSnapShot) {
 
-		if(tse != null) {
+	@Autowired
+	PlayerRepository playerRepository;
 
-			if(mte != null) {
+	@Autowired
+	TeamRepository teamRepository;
 
-				if(bte == null) {
+	@Autowired
+	MatchRepository matchRepository;
 
-					tse.getMatch(tourSnapShot.getMatchName()).addBatsmanEntity(_instance.prepare(tse.getMatch(tourSnapShot.getMatchName()), tourSnapShot.getMatch().getBattingTeam()));
-				}
-				if(bwte == null) {
+	@Autowired
+	GameSnapRepository gameSnapRepository;
 
-					tse.getMatch(tourSnapShot.getMatchName()).addBowlingEntity(_instance.prepare(tse.getMatch(tourSnapShot.getMatchName()), tourSnapShot.getMatch().getBowlingTeam()));
-				} 
-			} else {
-				MatchEntity mae = _instance.prepare(tse, tourSnapShot.getMatch());
-				if(bte == null) {
-
-					mae.addBatsmanEntity(_instance.prepare(tse.getMatch(tourSnapShot.getMatchName()), tourSnapShot.getMatch().getBattingTeam()));
-				} 
-				if(bwte == null) {
-
-					mae.addBowlingEntity(_instance.prepare(tse.getMatch(tourSnapShot.getMatchName()), tourSnapShot.getMatch().getBowlingTeam()));
-				} 
-				tse.addMatch(mae);
-			}
-			tse.getMatch(tourSnapShot.getMatchName()).addDelivery(_instance.prepare(mte, tourSnapShot.getMatch().getDelivery()));
-
-			return tse;
-		}
-		return _instance.prepareGameSnapShotEntity(tourSnapShot);
-		
-		
-		/*
-		  old code 
-		if(tse != null) {
-			MatchEntity match = tse.getMatch(tourSnapShot.getMatchName());
-			match.addDeliveries(newTse.getMatch(tourSnapShot.getMatchName()).getListDelivery());
-			return tse;
-		}
-		TourSnapShotEntity newTse =  _instance.prepareGameSnapShotEntity(tourSnapShot);
-
-		return newTse;
-		*/
+	public TourSnapShotEntity prepare(TourSnapShotEntity tse, TourSnapShot tourSnapShot) {
+		return prepareGameSnapShotEntity(tourSnapShot);
 	}
 	
 	private TourSnapShotEntity prepareGameSnapShotEntity(TourSnapShot tss) {
-		TourSnapShotEntity tsse = new TourSnapShotEntity();
+		TourSnapShotEntity tsse = gameSnapRepository.findByTourName(tss.getTourName()).orElse(new TourSnapShotEntity());
 		tsse.setTourName(tss.getTourName());
 		tsse.setInternational(tss.getInternational());
 		tsse.setCountry(tss.getCountry());
@@ -111,49 +89,55 @@ public class GameSnapUtil {
 	}
 
 	private MatchEntity prepare(TourSnapShotEntity gsse,Match m) {
-		MatchEntity me = new MatchEntity(gsse);
+		MatchEntity me = matchRepository.findByName(m.getName()).orElse(new MatchEntity(gsse));
 		me.setName(m.getName());
-		me.addBatsmanEntity(prepare(me, m.getBattingTeam()));
-		me.addBowlingEntity(prepare(me, m.getBowlingTeam()));
-		me.addDelivery(prepare(me, m.getDelivery()));
+		me.addParticipatingTeams(prepare(me, m.getBattingTeam()));
+		me.addParticipatingTeams(prepare(me, m.getBowlingTeam()));
+		me.addDelivery(prepare(me, m.getDelivery(),m));
 		return me;
-	}	
+	}
 
-	private BattingTeamEntity prepare(MatchEntity me, BattingTeam bt) {
-		BattingTeamEntity bte = new BattingTeamEntity(me);
+	private TeamEntity prepare(MatchEntity me, BattingTeam bt) {
+		TeamEntity bte=teamRepository.findByTeamName(bt.getName()).orElse( new TeamEntity(me));
 		bte.setId(bt.getId());
-		bte.setBatsman(prepare(bte, bt.getBatsman()));
-		bte.setBatsmanPartner(prepare(bte, bt.getBatsmanPartner()));
 		bte.setHome(bt.isHome());
-		bte.setName(bt.getName());
+		bte.setTeamName(bt.getName());
+		bte.addPlayer(null);
 		return bte;
 	}
 
-	private BatsmanPartnerEntity prepare(BattingTeamEntity bte, BatsmanPartner bp) {
-		BatsmanPartnerEntity bpe = new BatsmanPartnerEntity(bte);
-		bpe.setId(bp.getId());
+	private PlayerEntity prepare(TeamEntity bte, BatsmanPartner bp) {
+		PlayerEntity bpe = playerRepository.findByPlayerId(bp.getId()).orElse( new PlayerEntity(bte));
+		bpe.setPlayerId(bp.getId());
 		bpe.setName(bp.getName());
 		bpe.setRightHanded(bp.isRightHanded());
 		return bpe;
 	}
 
-	private BatsmanEntity prepare(BattingTeamEntity bte, Batsman b) {
-		BatsmanEntity be = new BatsmanEntity(bte);
-		be.setId(b.getId());
+	private PlayerEntity prepare(TeamEntity bte, Batsman b) {
+		PlayerEntity be = playerRepository.findByPlayerId(b.getId()).orElse( new PlayerEntity(bte));
+		be.setPlayerId(b.getId());
 		be.setName(b.getName());
 		be.setRightHanded(b.isRightHanded());
 		return be;
 	}
-	private BowlingTeamEntity prepare(MatchEntity me, BowlingTeam bt) {
-		BowlingTeamEntity bte = new BowlingTeamEntity(me);
-		bte.setName(bt.getName());
+	
+	private PlayerEntity prepare(TeamEntity prepare, Bowler b) {
+		PlayerEntity be =playerRepository.findByPlayerId(b.getId()).orElse( new PlayerEntity(prepare));
+		be.setPlayerId(b.getId());
+		be.setName(b.getName());
+		be.setRightHanded(b.isRightHanded());
+		return be;
+	}
+
+	private TeamEntity prepare(MatchEntity me, BowlingTeam bt) {
+		TeamEntity bte = teamRepository.findByTeamName(bt.getName()).orElse( new TeamEntity(me));
+		bte.setTeamName(bt.getName());
 		bte.setHome(bt.isHome());
-		bte.setBowler(prepare(bte,bt.getBowler()));
-		bte.setBowlerPartner(prepare(bte,bt.getBowlerPartner()));
-		
 		return bte;
 	}
-	private DeliveryEntity prepare(MatchEntity me, Delivery d) {
+	
+	private DeliveryEntity prepare(MatchEntity me, Delivery d,Match m) {
 		DeliveryEntity de = new DeliveryEntity(me);
 		de.setAdditionalEventInformation(prepare(de, d.getAdditionalEventInformation()));
 		de.setDeliveryNumber(prepare(de, d.getDeliveryNumber()));
@@ -165,18 +149,22 @@ public class GameSnapUtil {
 		de.setShotInformation(prepare(de, d.getShotInformation()));
 		de.setTimecode(d.getTimecode());
 		de.setTrajectory(prepare(de, d.getTrajectory()));
+		
+		de.setBatsman(this.playerRepository.findById(m.getBattingTeam().getBatsman().getId()).orElse(prepare(prepare(me,m.getBattingTeam()),m.getBattingTeam().getBatsman())));
+		de.setBatsmanPartner(playerRepository.findById(m.getBattingTeam().getBatsmanPartner().getId()).orElse(prepare(prepare(me,m.getBattingTeam()),m.getBattingTeam().getBatsmanPartner())));
+		de.setBowler(playerRepository.findById(m.getBowlingTeam().getBowler().getId()).orElse(prepare(prepare(me,m.getBattingTeam()),m.getBowlingTeam().getBowler())));
+		
+		//de.setBatsman(prepare(prepare(me,m.getBattingTeam()),m.getBattingTeam().getBatsman()));
+		//de.setBatsmanPartner(prepare(prepare(me,m.getBattingTeam()),m.getBattingTeam().getBatsmanPartner()));
+		//de.setBowler(prepare(prepare(me,m.getBowlingTeam()),m.getBowlingTeam().getBowler()));
+		//de.setBatsmanPartner(playerRepository.getById(m.getBattingTeam().getBatsmanPartner().getId()));
+		//de.setBowler(playerRepository.getById(m.getBowlingTeam().getBowler().getId()));
+		
 		return de;
 	}
 	
-	private BowlerPartnerEntity prepare(BowlingTeamEntity bte, BowlerPartner bp) {
-		BowlerPartnerEntity bpe = new BowlerPartnerEntity(bte);
-		bpe.setId(bp.getId());
-		bpe.setName(bp.getName());
-		bpe.setRightHanded(bp.isRightHanded());
-		return bpe;
-	}
-
-	private BowlerEntity prepare(BowlingTeamEntity bte, Bowler b) {
+	/*
+	private BowlerEntity prepare(TeamEntity bte, Bowler b) {
 		BowlerEntity be = new BowlerEntity(bte);
 		be.setId(b.getId());
 		be.setName(b.getName());
@@ -184,7 +172,7 @@ public class GameSnapUtil {
 		be.setSpell(b.getSpell());
 		return be;
 	}
-
+*/
 	private TrajectoryEntity prepare(DeliveryEntity de, Trajectory t) {
 		TrajectoryEntity te = new TrajectoryEntity(de);
 		te.setBounceAboveStumps(t.isBounceAboveStumps());

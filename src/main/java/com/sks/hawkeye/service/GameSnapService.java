@@ -8,12 +8,14 @@ import com.sks.hawkeye.response.TourSnapShotRes;
 public interface GameSnapService {
 
 	void processGameSnap(String fileId);
+	/*
 
 	TourSnapShotRes getTourSnapShot(String tourName);
-	
+
 	BattingTeam getBattingTeam(String id);
 	
 	BowlingTeam getBowlingTeam(String id);
-	
 	Match getMatch(String name);
+		*/
+
 }
