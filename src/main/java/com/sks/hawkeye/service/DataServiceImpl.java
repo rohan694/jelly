@@ -32,8 +32,8 @@ public class DataServiceImpl implements DataService {
 	@Override
 	public List<DataResponse> getData(DataRequestDto data) {
 		
-		String query = "select bsmn.name as batsman1, bsmn.right_handed as batsman1RightHanded, bsmn_ptr.name as batsman2, "
-				+ "bsmn_ptr.right_handed as batsman2RightHand, bowl_team.name as bowlingTeamName, "
+		String query = "select ma.name as matchName, bsmn.name as batsman1, bsmn.right_handed as batsman1RightHanded, bsmn_ptr.name as batsman2, "
+				+ "bsmn_ptr.right_handed as batsman2RightHand, bsmn.team_id as battingteamname, bowler.team_id as bowlingTeamName, "
 				+ "bowler.name as bowlerName, "
 				+ "bowler.right_handed as isBowlerRightHanded, "
 				+ "delivery.delivery_type as deliverytype,  "
@@ -47,18 +47,13 @@ public class DataServiceImpl implements DataService {
 				+ "stump_position.x as stump_position_x, stump_position.y as stump_position_y, stump_position.z as stump_position_z, "
 				+ "landing_position.x as landing_position_x, landing_position.y as landing_position_y,  "
 				+ "landing_position.z as landing_position_z,   "
-				+ "shot_info.shot_attacked as shotAttacked, shot_info.shot_played as shotPlayed, "
-				+ "ba.name as battingTeamName,"
-				+ " ma.name as matchName "
-				+ "from Tour_Snap_Shot as tss "
+				+ "shot_info.shot_attacked as shotAttacked, shot_info.shot_played as shotPlayed "
+				+ "from tour_snap_shot as tss "
 				+ "INNER JOIN match as ma ON ma.tour_id = tss.tour_name "
-				+ "INNER JOIN batting_team as ba ON ba.match_id = ma.id "
-				+ "INNER JOIN batsman as bsmn ON ba.pid = bsmn.batting_team_pid "
-				+ "INNER JOIN batsman_partner as bsmn_ptr ON bsmn_ptr.batting_team_pid = ba.pid "
-				+ "INNER JOIN bowling_team as bowl_team ON bowl_team.match_id = ma.id "
-				+ "INNER JOIN bowler as bowler ON bowler.bowling_team_id = bowl_team.id "
-				+ "INNER JOIN bowler_partner as bowler_ptr ON bowler_ptr.bowling_team_id = bowl_team.id "
 				+ "INNER JOIN delivery as delivery ON delivery.match_id = ma.id "
+				+ "INNER JOIN players as bsmn ON bsmn.player_id = delivery.batsman_id "
+				+ "INNER JOIN players as bsmn_ptr ON bsmn_ptr.player_id = delivery.batsman_partner_id "
+				+ "INNER JOIN players as bowler ON bowler.player_id = delivery.bowler_id " 
 				+ "INNER JOIN delivery_number ON delivery_number.delivery_id = delivery.id "
 				+ "INNER JOIN scoring_info ON scoring_info.delivery_id = delivery.id "
 				+ "INNER JOIN wicket ON wicket.scoring_information_id = scoring_info.id "
@@ -116,7 +111,7 @@ public class DataServiceImpl implements DataService {
 			filtering += " and bowler.name = :bowlerName ";
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getBowlerCountry())) {
-			filtering += " and bowl_team.name = :bowlerCountry ";
+			filtering += " and bowler.team_id = :bowlerCountry ";
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getScore()) && !"All".equals(data.getFiltering().getScore())) {
 			filtering += " and scoring_info.score = :score ";
