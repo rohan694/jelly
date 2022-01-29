@@ -33,12 +33,12 @@ public class MatchEntity {
 	
 	public String name;
 	
-	@ManyToMany(cascade = CascadeType.ALL)
+	@ManyToMany
 	@JoinTable(
 			  name = "match_team_mapping", 
 			  joinColumns = @JoinColumn(name = "id"), 
 			  inverseJoinColumns = @JoinColumn(name = "teamName"))
-	@NotFound(action = NotFoundAction.IGNORE)
+	//@NotFound(action = NotFoundAction.IGNORE)
 	public Set<TeamEntity> participatingTeams = new HashSet<TeamEntity>();
 
 	@OneToMany(mappedBy = "match", cascade = CascadeType.ALL)	//@PrimaryKeyJoinColumn

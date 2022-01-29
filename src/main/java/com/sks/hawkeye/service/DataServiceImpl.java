@@ -54,6 +54,10 @@ public class DataServiceImpl implements DataService {
 				+ "INNER JOIN players as bsmn ON bsmn.player_id = delivery.batsman_id "
 				+ "INNER JOIN players as bsmn_ptr ON bsmn_ptr.player_id = delivery.batsman_partner_id "
 				+ "INNER JOIN players as bowler ON bowler.player_id = delivery.bowler_id " 
+
+				+ "INNER JOIN teams as bat_team ON bat_team.team_name = bsmn.team_id " 
+				+ "INNER JOIN teams as bowl_team ON bowl_team.team_name = bowler.team_id " 
+				
 				+ "INNER JOIN delivery_number ON delivery_number.delivery_id = delivery.id "
 				+ "INNER JOIN scoring_info ON scoring_info.delivery_id = delivery.id "
 				+ "INNER JOIN wicket ON wicket.scoring_information_id = scoring_info.id "
@@ -71,9 +75,9 @@ public class DataServiceImpl implements DataService {
 		if(CommonUtil.isNotBlank(data.getDuration().getMatchName())) {
 			durationFilter += " and ma.name = :match_name";
 		}
-		if(data.getDuration().getFrom() != null && data.getDuration().getFrom().getDate() != null) {
+		/*if(data.getDuration().getFrom() != null && data.getDuration().getFrom().getDate() != null) {
 			durationFilter += " and delivery.timecode >= "+data.getDuration().getFrom().getDate();
-		}
+		}*/
 		if(data.getDuration().getFrom() != null && data.getDuration().getFrom().getOver() != 0 && data.getDuration().getFrom().getBall() != 0) {
 			durationFilter +=  " and (delivery_number.over > "+data.getDuration().getFrom().getOver()+" or (delivery_number.over = "+data.getDuration().getFrom().getOver()+" and delivery_number.ball >= "+data.getDuration().getFrom().getBall()+"))";
 		} else if(data.getDuration().getFrom() != null && data.getDuration().getFrom().getOver() != 0) {
@@ -85,10 +89,9 @@ public class DataServiceImpl implements DataService {
 		if(data.getDuration().getTo() != null && data.getDuration().getTo().getInning() != 0) {
 			durationFilter +=  " and delivery_number.innings <= "+data.getDuration().getTo().getInning();
 		}
-		if(data.getDuration().getTo() != null && data.getDuration().getTo().getDate() != null) {
+		/*if(data.getDuration().getTo() != null && data.getDuration().getTo().getDate() != null) {
 			durationFilter += " and delivery.timecode <= "+data.getDuration().getTo().getDate();
-		}
-
+		}*/
 		if(data.getDuration().getTo() != null && data.getDuration().getTo().getOver() != 0 && data.getDuration().getTo().getBall() != 0) {
 			durationFilter += " and (delivery_number.over < "+data.getDuration().getTo().getOver() +" or (delivery_number.over = "+data.getDuration().getTo().getOver()+" and delivery_number.ball <= "+data.getDuration().getTo().getBall()+"))";
 		} else if(data.getDuration().getTo() != null && data.getDuration().getTo().getOver() != 0) {
@@ -105,7 +108,7 @@ public class DataServiceImpl implements DataService {
 			filtering += " and bsmn_ptr.name = :batsman2 ";
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getBatsmanTeam())) {
-			filtering += " and ba.name = :batsmanteam ";
+			filtering += " and bat_team.team_name = :batsmanteam ";
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getBowlerName())) {
 			filtering += " and bowler.name = :bowlerName ";

@@ -25,9 +25,9 @@ public class PlayerEntity {
 	@Id
 	private BigInteger playerId;
 	
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="teamId", nullable=true)
-	@NotFound(action = NotFoundAction.IGNORE)
+	//@NotFound(action = NotFoundAction.IGNORE)
 	private TeamEntity team;
 	
 	private boolean rightHanded;

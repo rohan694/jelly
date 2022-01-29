@@ -102,10 +102,19 @@ public class GameSnapUtil {
 		bte.setId(bt.getId());
 		bte.setHome(bt.isHome());
 		bte.setTeamName(bt.getName());
-		bte.addPlayer(null);
+		//bte.addPlayer(null);
+		//teamRepository.save(bte);
 		return bte;
 	}
 
+	private TeamEntity prepare(MatchEntity me, BowlingTeam bt) {
+		TeamEntity bte = teamRepository.findByTeamName(bt.getName()).orElse( new TeamEntity(me));
+		bte.setTeamName(bt.getName());
+		bte.setHome(bt.isHome());
+		//teamRepository.save(bte);
+		return bte;
+	}
+	
 	private PlayerEntity prepare(TeamEntity bte, BatsmanPartner bp) {
 		PlayerEntity bpe = playerRepository.findByPlayerId(bp.getId()).orElse( new PlayerEntity(bte));
 		bpe.setPlayerId(bp.getId());
@@ -130,13 +139,6 @@ public class GameSnapUtil {
 		return be;
 	}
 
-	private TeamEntity prepare(MatchEntity me, BowlingTeam bt) {
-		TeamEntity bte = teamRepository.findByTeamName(bt.getName()).orElse( new TeamEntity(me));
-		bte.setTeamName(bt.getName());
-		bte.setHome(bt.isHome());
-		return bte;
-	}
-	
 	private DeliveryEntity prepare(MatchEntity me, Delivery d,Match m) {
 		DeliveryEntity de = new DeliveryEntity(me);
 		de.setAdditionalEventInformation(prepare(de, d.getAdditionalEventInformation()));
@@ -150,9 +152,12 @@ public class GameSnapUtil {
 		de.setTimecode(d.getTimecode());
 		de.setTrajectory(prepare(de, d.getTrajectory()));
 		
-		de.setBatsman(this.playerRepository.findById(m.getBattingTeam().getBatsman().getId()).orElse(prepare(prepare(me,m.getBattingTeam()),m.getBattingTeam().getBatsman())));
-		de.setBatsmanPartner(playerRepository.findById(m.getBattingTeam().getBatsmanPartner().getId()).orElse(prepare(prepare(me,m.getBattingTeam()),m.getBattingTeam().getBatsmanPartner())));
-		de.setBowler(playerRepository.findById(m.getBowlingTeam().getBowler().getId()).orElse(prepare(prepare(me,m.getBattingTeam()),m.getBowlingTeam().getBowler())));
+		TeamEntity batTeam=prepare(me, m.getBattingTeam());
+		TeamEntity bowlTeam=prepare(me, m.getBowlingTeam());
+		
+		de.setBatsman(this.playerRepository.findById(m.getBattingTeam().getBatsman().getId()).orElse(prepare(batTeam,m.getBattingTeam().getBatsman())));
+		de.setBatsmanPartner(playerRepository.findById(m.getBattingTeam().getBatsmanPartner().getId()).orElse(prepare(batTeam,m.getBattingTeam().getBatsmanPartner())));
+		de.setBowler(playerRepository.findById(m.getBowlingTeam().getBowler().getId()).orElse(prepare(bowlTeam,m.getBowlingTeam().getBowler())));
 		
 		//de.setBatsman(prepare(prepare(me,m.getBattingTeam()),m.getBattingTeam().getBatsman()));
 		//de.setBatsmanPartner(prepare(prepare(me,m.getBattingTeam()),m.getBattingTeam().getBatsmanPartner()));
