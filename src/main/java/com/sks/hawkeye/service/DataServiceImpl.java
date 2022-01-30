@@ -68,6 +68,7 @@ public class DataServiceImpl implements DataService {
 				+ "INNER JOIN stump_position ON stump_position.trajectory_id = trajectory.id "
 				+ "INNER JOIN landing_position ON landing_position.trajectory_id = trajectory.id "
 				+ "where tour_name = :tour_name ";
+				//+ "order by ma.name,delivery_number.innings, delivery_number.over, delivery_number.ball ASC";
 		String durationFilter = "";
 		if(CommonUtil.isNotBlank(data.getDuration().getTournamentFormat())) {
 			durationFilter += " and format = :format";
