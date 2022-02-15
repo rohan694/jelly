@@ -13,25 +13,31 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.sks.hawkeye.dto.TourSnapShot;
 import com.sks.hawkeye.model.FileDB;
 import com.sks.hawkeye.process.FileUploadEvent;
+import com.sks.hawkeye.process.FileUploadEventProcessor;
 import com.sks.hawkeye.response.ResponseFile;
 import com.sks.hawkeye.response.ResponseMessage;
 import com.sks.hawkeye.service.FileDbStorageService;
+import com.sks.hawkeye.service.GameSnapService;
 
 @Controller
 @RequestMapping("/db")
 public class HawkDbController {
 	@Autowired
 	private FileDbStorageService storageService;
-	
+
 	@Autowired
 	private ApplicationEventPublisher applicationEventPublisher;	
+	@Autowired
+	private GameSnapService gameSnapService;	
 /*
 	@PostMapping("/upload")
 	public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("file") MultipartFile file) {
@@ -60,6 +66,19 @@ public class HawkDbController {
 			message = "Could not upload the file: " + file.getOriginalFilename() + "!";
 			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ResponseMessage(message));
 		}
+		}
+		return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
+	}
+	@PostMapping("/uploadUsingJson")
+	public ResponseEntity<ResponseMessage> uploadFile(@RequestBody TourSnapShot ts) {
+		String message = "";
+		try {
+			gameSnapService.processGameSnapUsingTourSnap(ts);
+			message+= "Uploaded the data successfully: /n";
+			
+		} catch (Exception e) {
+			message = "Could not upload the data, Something went wrong";
+			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ResponseMessage(message));
 		}
 		return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
 	}

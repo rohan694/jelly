@@ -68,6 +68,33 @@ public class GameSnapServiceImpl implements GameSnapService {
 			}
 		}
 	}
+	
+
+	@Override
+	public void processGameSnapUsingTourSnap(TourSnapShot ts) {
+
+			ObjectMapper mapper = new ObjectMapper();
+			
+			try {
+				TourSnapShotEntity tse = gameSnapRepository.getByTourName(ts.getTourName());
+				//MatchEntity mte = matchRepo.getByName(ts.getMatchName());
+				
+				//TeamEntity bwte = teamRepo.getByTeamId(ts.getMatch().getBowlingTeam().getId());
+				
+				//TeamEntity bte = teamRepo.getByTeamId(ts.getMatch().getBattingTeam().getId());
+
+				tse = gameSnapUtil.prepare(tse, ts);
+				
+				gameSnapRepository.save(tse);
+				
+				System.out.println("Game Snap Saved!");
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.out.println("Unable to save users: " + e);
+			}
+	}
+	
+	
 	/*
 	@Override
 	public TourSnapShotRes getTourSnapShot(String tourName) {
