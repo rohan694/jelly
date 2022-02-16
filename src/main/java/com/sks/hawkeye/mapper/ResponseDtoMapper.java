@@ -38,6 +38,11 @@ public class ResponseDtoMapper implements RowMapper<DataResponse> {
 			dto.setBouncePosition(new ReleasePosition(rs.getDouble("bounce_position_x"),rs.getDouble("bounce_position_y"),rs.getDouble("bounce_position_z")));
 			dto.setStumpPosition(new ReleasePosition(rs.getDouble("stump_position_x"),rs.getDouble("stump_position_y"),rs.getDouble("stump_position_z")));
 			dto.setLandingPosition(new ReleasePosition(rs.getDouble("landing_position_x"),rs.getDouble("landing_position_y"),rs.getDouble("landing_position_z")));
+			
+			dto.setInnings(rs.getDouble("innings"));
+			dto.setShotTypeAdditional(rs.getString("shot_type_additional"));
+			dto.setRealDistance(rs.getDouble("real_distance"));
+
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

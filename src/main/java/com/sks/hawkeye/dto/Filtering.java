@@ -16,6 +16,8 @@ public class Filtering {
 	private String batsmanTeam ;
 	private String bowlerName ;
 	private String bowlerCountry ;
+	private int bouncePosition ;
+	private int stumpPosition ;
 	private String score ;
 	private String extraType ;
 	private String shotAttacked ;

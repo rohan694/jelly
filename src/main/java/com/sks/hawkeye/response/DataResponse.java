@@ -33,4 +33,8 @@ public class DataResponse {
 	private ReleasePosition landingPosition;
 	private boolean isRightHandedBowler;
 	
+	private double innings;
+	private double realDistance;
+	private String shotTypeAdditional;
+
 }

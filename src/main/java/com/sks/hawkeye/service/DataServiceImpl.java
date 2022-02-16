@@ -38,6 +38,9 @@ public class DataServiceImpl implements DataService {
 				+ "bowler.right_handed as isBowlerRightHanded, "
 				+ "delivery.delivery_type as deliverytype,  "
 				+ "delivery_number.ball as ball, "
+				+ "delivery_number.innings as innings,"
+				+ "shot_info.shot_type_additional as shot_type_additional,"
+				+ "trajectory.real_distance as real_distance,"
 				+ "delivery_number.over as over , scoring_info.extras_score as extraScore,  "
 				+ "scoring_info.extras_type as extraType, scoring_info.score as score,  "
 				+ "wicket.wicket as IsWicket, trajectory.release_speed as release_speed,"
@@ -117,9 +120,9 @@ public class DataServiceImpl implements DataService {
 		if(CommonUtil.isNotBlank(data.getFiltering().getBowlerCountry())) {
 			filtering += " and bowler.team_id = :bowlerCountry ";
 		}
-		if(CommonUtil.isNotBlank(data.getFiltering().getScore()) && !"All".equals(data.getFiltering().getScore())) {
-			filtering += " and scoring_info.score = :score ";
-		}
+//		if(CommonUtil.isNotBlank(data.getFiltering().getScore()) && !"All".equals(data.getFiltering().getScore())  && !"0".equals(data.getFiltering().getScore())) {
+//			filtering += " and scoring_info.score = :score ";
+//		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getExtraType())) {
 			filtering += " and scoring_info.extras_type = :extraType ";
 		}
@@ -140,6 +143,34 @@ public class DataServiceImpl implements DataService {
 		}
 		if(data.getFiltering().getIsRightHandedBowler().isPresent()) {
 			filtering += " and bowler.right_handed =  :isRightHandedBowler";
+		}
+		if(data.getFiltering().getBouncePosition()>0) {
+			if(data.getFiltering().getBouncePosition()==1) filtering += " and bounce_position.x<0";
+			if(data.getFiltering().getBouncePosition()==2) filtering += " and (bounce_position.x>0 and bounce_position.x<=2)";
+			if(data.getFiltering().getBouncePosition()==3) filtering += " and (bounce_position.x>2 and bounce_position.x<=6)";
+			if(data.getFiltering().getBouncePosition()==4) filtering += " and (bounce_position.x>6 and bounce_position.x<=8)";
+			if(data.getFiltering().getBouncePosition()==5) filtering += " and (bounce_position.x>8 )";
+		}
+		if(data.getFiltering().getStumpPosition()>0) {
+			if(data.getFiltering().getStumpPosition()==1) filtering += " and (((stump_position.y > 0) and (stump_position.y < 0.15)) or ((stump_position.y < 0) and (stump_position.y > -0.15)))";
+			if(data.getFiltering().getStumpPosition()==2) filtering += "and (case when bsmn.right_handed then stump_position.y>0.3 else stump_position.y<-0.3 end)";
+			if(data.getFiltering().getStumpPosition()==3) filtering += "and (case when bsmn.right_handed then (stump_position.y>0.15 and stump_position.y<0.3) else (stump_position.y<-0.15 and stump_position.y>-0.3) end)";
+			if(data.getFiltering().getStumpPosition()==4) filtering += "and (case when bsmn.right_handed then stump_position.y<-0.15 else stump_position.y>0.15 end) ";
+		}
+		String score="";
+		
+		if(CommonUtil.isNotBlank(data.getFiltering().getScore()) && !"0".equals(data.getFiltering().getScore())) {
+			switch (Integer.parseInt(data.getFiltering().getScore())) {
+				case 1: score="1,2,3,4,6"; break;
+				case 2: score="4,6"; break;
+				case 3: score="1,2,3"; break;
+				case 4: score="1"; break;
+				case 5: score="2"; break;
+				case 6: score="3"; break;
+				case 7: score="4"; break;
+				case 8: score="6"; break;
+			}
+			filtering += " and scoring_info.score in ("+score+")";
 		}
 		Map inputs=new HashMap<>();
 		
@@ -167,7 +198,7 @@ public class DataServiceImpl implements DataService {
 			inputs.put("bowlerCountry", data.getFiltering().getBowlerCountry());
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getScore()) && !"All".equals(data.getFiltering().getScore())) {
-			inputs.put("score", Integer.parseInt(data.getFiltering().getScore()));
+			inputs.put("score", score);
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getExtraType())) {
 			inputs.put("extraType", data.getFiltering().getExtraType());
