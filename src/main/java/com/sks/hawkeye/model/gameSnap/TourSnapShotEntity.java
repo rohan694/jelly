@@ -19,12 +19,17 @@ public class TourSnapShotEntity {
 	@Id
 	@Column(name = "tourName", nullable = false)
 	public String tourName;
+	
+	private String actualTourName;
+	private int tournamentYear;
+
 	public String country;
 	public String format;
 	public String international;
 	
 	@OneToMany(mappedBy = "gameSnapShot", cascade = CascadeType.ALL)	//@PrimaryKeyJoinColumn
 	private Set<MatchEntity> listMatch  = new HashSet<>();
+	
 	
 	public String getCountry() {
 		return country;
@@ -79,6 +84,22 @@ public class TourSnapShotEntity {
 		}
 		return null;
 	}
-	
+
+	public String getActualTourName() {
+		return actualTourName;
+	}
+
+	public void setActualTourName(String actualTourName) {
+		this.actualTourName = actualTourName;
+	}
+
+	public int getTournamentYear() {
+		return tournamentYear;
+	}
+
+	public void setTournamentYear(int tournamentYear) {
+		this.tournamentYear = tournamentYear;
+	}
+
 
 }

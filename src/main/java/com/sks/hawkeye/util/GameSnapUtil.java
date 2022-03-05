@@ -77,10 +77,20 @@ public class GameSnapUtil {
 	public TourSnapShotEntity prepare(TourSnapShotEntity tse, TourSnapShot tourSnapShot) {
 		return prepareGameSnapShotEntity(tourSnapShot);
 	}
-	
+	public String getActualTourName(String tourname) {
+		return tourname.split("_")[4].split("-")[0].replaceAll("-", " ");
+	}
+	public int getTournamentYear(String tourname) {
+		return Integer.parseInt("20"+tourname.split("_")[1]);
+	}
+	public String getVenueName(String matchName) {
+		return matchName.split("_")[4].replaceAll("-", " ");
+	}
 	private TourSnapShotEntity prepareGameSnapShotEntity(TourSnapShot tss) {
 		TourSnapShotEntity tsse = gameSnapRepository.findByTourName(tss.getTourName()).orElse(new TourSnapShotEntity());
 		tsse.setTourName(tss.getTourName());
+		tsse.setActualTourName(getActualTourName(tss.getTourName()));
+		tsse.setTournamentYear(getTournamentYear(tss.getTourName()));
 		tsse.setInternational(tss.getInternational());
 		tsse.setCountry(tss.getCountry());
 		tsse.setFormat(tss.getFormat());
@@ -91,6 +101,7 @@ public class GameSnapUtil {
 	private MatchEntity prepare(TourSnapShotEntity gsse,Match m) {
 		MatchEntity me = matchRepository.findByName(m.getName()).orElse(new MatchEntity(gsse));
 		me.setName(m.getName());
+		me.setVenue(getVenueName(m.getName()));
 		me.addParticipatingTeams(prepare(me, m.getBattingTeam()));
 		me.addParticipatingTeams(prepare(me, m.getBowlingTeam()));
 		me.addDelivery(prepare(me, m.getDelivery(),m));

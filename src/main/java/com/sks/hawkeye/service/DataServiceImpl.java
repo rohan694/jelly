@@ -18,13 +18,17 @@ import com.sks.hawkeye.dto.DataRequestDto;
 import com.sks.hawkeye.mapper.ResponseDtoMapper;
 import com.sks.hawkeye.response.DataResponse;
 import com.sks.hawkeye.util.CommonUtil;
+import com.sks.hawkeye.util.GameSnapUtil;
 
 @Service
 public class DataServiceImpl implements DataService {
 
 	@PersistenceContext
 	private EntityManager entityManager;
-	
+
+	@Autowired
+	private GameSnapUtil gameSnapUtil;
+
 	@Autowired
 	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 	
@@ -73,93 +77,107 @@ public class DataServiceImpl implements DataService {
 				+ "where ";
 				//+ "order by ma.name,delivery_number.innings, delivery_number.over, delivery_number.ball ASC";
 		
+		
 		String durationFilter = "";
 		if(CommonUtil.isNotBlank(data.getDuration().getTournamentName())) {
-			durationFilter += " tour_name = :tour_name ";
+			durationFilter +=andAppender(durationFilter)+" lower(actual_tour_name) = lower(:actual_tour_name) ";
 		}
+		if(CommonUtil.isNotBlank(data.getDuration().getTournamentYear()) && CommonUtil.isNotBlank(data.getDuration().getFetchTournaments()) ) {
+			durationFilter +=andAppender(durationFilter)+ " (tournament_year>= :tournament_year-:no_of_past_tournaments and tournament_year<= :tournament_year)";
+
+		} else if(CommonUtil.isNotBlank(data.getDuration().getTournamentYear())) {
+			durationFilter += andAppender(durationFilter)+" tournament_year = :tournament_year ";
+		}
+		
 		if(CommonUtil.isNotBlank(data.getDuration().getTournamentFormat())) {
-			durationFilter += " and format = :format";
+			durationFilter += andAppender(durationFilter)+" format = :format";
 		}
 		if(CommonUtil.isNotBlank(data.getDuration().getMatchName())) {
-			durationFilter += " and ma.name = :match_name";
+			durationFilter += andAppender(durationFilter)+"  lower(ma.name) = lower(:match_name)";
 		}
+		if(CommonUtil.isNotBlank(data.getDuration().getVenueName())) {
+			durationFilter += andAppender(durationFilter)+"  lower(ma.venue) =lower(:venue_name)";
+		}
+//		if(CommonUtil.isNotBlank(data.getDuration().getFetchMatches())) {
+//			durationFilter += " and ma.name = :match_name";
+//		}
 		/*if(data.getDuration().getFrom() != null && data.getDuration().getFrom().getDate() != null) {
 			durationFilter += " and delivery.timecode >= "+data.getDuration().getFrom().getDate();
 		}*/
 		if(data.getDuration().getFrom() != null && data.getDuration().getFrom().getOver() != 0 && data.getDuration().getFrom().getBall() != 0) {
-			durationFilter +=  " and (delivery_number.over > "+data.getDuration().getFrom().getOver()+" or (delivery_number.over = "+data.getDuration().getFrom().getOver()+" and delivery_number.ball >= "+data.getDuration().getFrom().getBall()+"))";
+			durationFilter += andAppender(durationFilter)+ "  (delivery_number.over > "+data.getDuration().getFrom().getOver()+" or (delivery_number.over = "+data.getDuration().getFrom().getOver()+" and delivery_number.ball >= "+data.getDuration().getFrom().getBall()+"))";
 		} else if(data.getDuration().getFrom() != null && data.getDuration().getFrom().getOver() != 0) {
-			durationFilter += " and delivery_number.over >= "+data.getDuration().getFrom().getOver();
+			durationFilter += andAppender(durationFilter)+ "  delivery_number.over >= "+data.getDuration().getFrom().getOver();
 		}
 		if(data.getDuration().getFrom() != null && data.getDuration().getFrom().getInning() != 0) {
-			durationFilter +=  " and delivery_number.innings >= "+data.getDuration().getFrom().getInning();
+			durationFilter += andAppender(durationFilter)+ "  delivery_number.innings >= "+data.getDuration().getFrom().getInning();
 		}
 		if(data.getDuration().getTo() != null && data.getDuration().getTo().getInning() != 0) {
-			durationFilter +=  " and delivery_number.innings <= "+data.getDuration().getTo().getInning();
+			durationFilter += andAppender(durationFilter)+ "  delivery_number.innings <= "+data.getDuration().getTo().getInning();
 		}
 		/*if(data.getDuration().getTo() != null && data.getDuration().getTo().getDate() != null) {
 			durationFilter += " and delivery.timecode <= "+data.getDuration().getTo().getDate();
 		}*/
 		if(data.getDuration().getTo() != null && data.getDuration().getTo().getOver() != 0 && data.getDuration().getTo().getBall() != 0) {
-			durationFilter += " and (delivery_number.over < "+data.getDuration().getTo().getOver() +" or (delivery_number.over = "+data.getDuration().getTo().getOver()+" and delivery_number.ball <= "+data.getDuration().getTo().getBall()+"))";
+			durationFilter += andAppender(durationFilter)+"  (delivery_number.over < "+data.getDuration().getTo().getOver() +" or (delivery_number.over = "+data.getDuration().getTo().getOver()+" and delivery_number.ball <= "+data.getDuration().getTo().getBall()+"))";
 		} else if(data.getDuration().getTo() != null && data.getDuration().getTo().getOver() != 0) {
-			durationFilter += " and delivery_number.over <= "+data.getDuration().getTo().getOver();
+			durationFilter += andAppender(durationFilter)+"  delivery_number.over <= "+data.getDuration().getTo().getOver();
 		}
 		
 		
 		
 		String filtering = "";
 		if(CommonUtil.isNotBlank(data.getFiltering().getBatsman1())) {
-			filtering += " and bsmn.name = :batsman1 ";
+			filtering += andAppender(filtering+durationFilter)+"  lower(bsmn.name) = lower(:batsman1) ";
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getBatsman2())) {
-			filtering += " and bsmn_ptr.name = :batsman2 ";
+			filtering += andAppender(filtering+durationFilter)+"   lower(bsmn_ptr.name) = lower(:batsman2) ";
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getBatsmanTeam())) {
-			filtering += " and bat_team.team_name = :batsmanteam ";
+			filtering += andAppender(filtering+durationFilter)+"   bat_team.team_name = :batsmanteam ";
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getBowlerName())) {
-			filtering += " and bowler.name = :bowlerName ";
+			filtering += andAppender(filtering+durationFilter)+"   lower(bowler.name) = lower(:bowlerName) ";
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getBowlerCountry())) {
-			filtering += " and bowler.team_id = :bowlerCountry ";
+			filtering += andAppender(filtering+durationFilter)+"   bowler.team_id = :bowlerCountry ";
 		}
 //		if(CommonUtil.isNotBlank(data.getFiltering().getScore()) && !"All".equals(data.getFiltering().getScore())  && !"0".equals(data.getFiltering().getScore())) {
 //			filtering += " and scoring_info.score = :score ";
 //		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getExtraType())) {
-			filtering += " and scoring_info.extras_type = :extraType ";
+			filtering += andAppender(filtering+durationFilter)+"   scoring_info.extras_type = :extraType ";
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getShotAttacked())) {
-			filtering += " and shot_info.shot_attacked = :shotAttacked ";
+			filtering += andAppender(filtering+durationFilter)+"   shot_info.shot_attacked = :shotAttacked ";
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getShotPlayed())) {
-			filtering += " and shot_info.shot_played = :shotPlayed ";
+			filtering += andAppender(filtering+durationFilter)+"   shot_info.shot_played = :shotPlayed ";
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getDeliveryType())) {
-			filtering += " and delivery.delivery_type = :deliveryType ";
+			filtering += andAppender(filtering+durationFilter)+"   delivery.delivery_type = :deliveryType ";
 		}
 		if(data.getFiltering().isWicket()) {
-			filtering += " and wicket.wicket = :wicket ";
+			filtering += andAppender(filtering+durationFilter)+"   wicket.wicket = :wicket ";
 		}
 		if(data.getFiltering().getIsRightHandedBatsman().isPresent()) {
-			filtering += " and bsmn.right_handed = :isRightHandedBatsman ";
+			filtering += andAppender(filtering+durationFilter)+"   bsmn.right_handed = :isRightHandedBatsman ";
 		}
 		if(data.getFiltering().getIsRightHandedBowler().isPresent()) {
-			filtering += " and bowler.right_handed =  :isRightHandedBowler";
+			filtering += andAppender(filtering+durationFilter)+"   bowler.right_handed =  :isRightHandedBowler";
 		}
 		if(data.getFiltering().getBouncePosition()>0) {
-			if(data.getFiltering().getBouncePosition()==1) filtering += " and bounce_position.x<0";
-			if(data.getFiltering().getBouncePosition()==2) filtering += " and (bounce_position.x>0 and bounce_position.x<=2)";
-			if(data.getFiltering().getBouncePosition()==3) filtering += " and (bounce_position.x>2 and bounce_position.x<=6)";
-			if(data.getFiltering().getBouncePosition()==4) filtering += " and (bounce_position.x>6 and bounce_position.x<=8)";
-			if(data.getFiltering().getBouncePosition()==5) filtering += " and (bounce_position.x>8 )";
+			if(data.getFiltering().getBouncePosition()==1) filtering += andAppender(filtering+durationFilter)+"   bounce_position.x<0";
+			if(data.getFiltering().getBouncePosition()==2) filtering += andAppender(filtering+durationFilter)+"   (bounce_position.x>0 and bounce_position.x<=2)";
+			if(data.getFiltering().getBouncePosition()==3) filtering += andAppender(filtering+durationFilter)+"   (bounce_position.x>2 and bounce_position.x<=6)";
+			if(data.getFiltering().getBouncePosition()==4) filtering += andAppender(filtering+durationFilter)+"  (bounce_position.x>6 and bounce_position.x<=8)";
+			if(data.getFiltering().getBouncePosition()==5) filtering += andAppender(filtering+durationFilter)+"  (bounce_position.x>8 )";
 		}
 		if(data.getFiltering().getStumpPosition()>0) {
-			if(data.getFiltering().getStumpPosition()==1) filtering += " and (((stump_position.y > 0) and (stump_position.y < 0.15)) or ((stump_position.y < 0) and (stump_position.y > -0.15)))";
-			if(data.getFiltering().getStumpPosition()==2) filtering += "and (case when bsmn.right_handed then stump_position.y>0.3 else stump_position.y<-0.3 end)";
-			if(data.getFiltering().getStumpPosition()==3) filtering += "and (case when bsmn.right_handed then (stump_position.y>0.15 and stump_position.y<0.3) else (stump_position.y<-0.15 and stump_position.y>-0.3) end)";
-			if(data.getFiltering().getStumpPosition()==4) filtering += "and (case when bsmn.right_handed then stump_position.y<-0.15 else stump_position.y>0.15 end) ";
+			if(data.getFiltering().getStumpPosition()==1) filtering += andAppender(filtering+durationFilter)+"  (((stump_position.y > 0) and (stump_position.y < 0.15)) or ((stump_position.y < 0) and (stump_position.y > -0.15)))";
+			if(data.getFiltering().getStumpPosition()==2) filtering += andAppender(filtering+durationFilter)+"  (case when bsmn.right_handed then stump_position.y>0.3 else stump_position.y<-0.3 end)";
+			if(data.getFiltering().getStumpPosition()==3) filtering += andAppender(filtering+durationFilter)+"  (case when bsmn.right_handed then (stump_position.y>0.15 and stump_position.y<0.3) else (stump_position.y<-0.15 and stump_position.y>-0.3) end)";
+			if(data.getFiltering().getStumpPosition()==4) filtering += andAppender(filtering+durationFilter)+"  (case when bsmn.right_handed then stump_position.y<-0.15 else stump_position.y>0.15 end) ";
 		}
 		String score="";
 		
@@ -174,29 +192,36 @@ public class DataServiceImpl implements DataService {
 				case 7: score="4"; break;
 				case 8: score="6"; break;
 			}
-			filtering += " and scoring_info.score in ("+score+")";
+			filtering += andAppender(filtering+durationFilter)+"  scoring_info.score in ("+score+")";
 		}
 		Map inputs=new HashMap<>();
 		
 		//Query nativeQuery = entityManager.createQuery(query + durationFilter + filtering);
-		inputs.put("tour_name", data.getDuration().getTournamentName());
+		inputs.put("actual_tour_name",CommonUtil.replaceSpecialChar(data.getDuration().getTournamentName()));
+		inputs.put("venue_name",CommonUtil.replaceSpecialChar(data.getDuration().getVenueName()));
 		if(CommonUtil.isNotBlank(data.getDuration().getTournamentFormat())) {
 			inputs.put("format", data.getDuration().getTournamentFormat());
 		}
+		if(CommonUtil.isNotBlank(data.getDuration().getTournamentYear())) {
+			inputs.put("tournament_year", data.getDuration().getTournamentYear());
+		}
+		if(CommonUtil.isNotBlank(data.getDuration().getFetchTournaments())) {
+			inputs.put("no_of_past_tournaments", data.getDuration().getFetchTournaments());
+		}
 		if(CommonUtil.isNotBlank(data.getDuration().getMatchName())) {
-			inputs.put("match_name", data.getDuration().getMatchName());
+			inputs.put("match_name", CommonUtil.replaceSpecialChar(data.getDuration().getMatchName()));
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getBatsman1())) {
-			inputs.put("batsman1", data.getFiltering().getBatsman1());
+			inputs.put("batsman1", CommonUtil.replaceSpecialChar(data.getFiltering().getBatsman1()));
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getBatsman2())) {
-			inputs.put("batsman2", data.getFiltering().getBatsman2());
+			inputs.put("batsman2", CommonUtil.replaceSpecialChar(data.getFiltering().getBatsman2()));
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getBatsmanTeam())) {
 			inputs.put("batsmanteam", data.getFiltering().getBatsmanTeam());
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getBowlerName())) {
-			inputs.put("bowlerName", data.getFiltering().getBowlerName());
+			inputs.put("bowlerName", CommonUtil.replaceSpecialChar(data.getFiltering().getBowlerName()));
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getBowlerCountry())) {
 			inputs.put("bowlerCountry", data.getFiltering().getBowlerCountry());
@@ -238,6 +263,11 @@ public class DataServiceImpl implements DataService {
 		}
 
 	    return rows;
+	}
+
+	private String andAppender(String conditions) {
+		
+		return conditions.equals("")?"":" and ";
 	}
 
 }

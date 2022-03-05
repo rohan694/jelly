@@ -32,6 +32,7 @@ public class MatchEntity {
 	private long id;
 	
 	public String name;
+	public String venue;
 	
 	@ManyToMany
 	@JoinTable(
@@ -100,5 +101,17 @@ public class MatchEntity {
 				this.listDelivery.add(d);
 			}
 		}
+	}
+	public String getVenue() {
+		return venue;
+	}
+	public void setVenue(String venue) {
+		this.venue = venue;
+	}
+	public Set<TeamEntity> getParticipatingTeams() {
+		return participatingTeams;
+	}
+	public void setParticipatingTeams(Set<TeamEntity> participatingTeams) {
+		this.participatingTeams = participatingTeams;
 	}
 }
