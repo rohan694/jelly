@@ -80,7 +80,7 @@ public class DataServiceImpl implements DataService {
 		
 		String durationFilter = "";
 		if(CommonUtil.isNotBlank(data.getDuration().getTournamentName())) {
-			durationFilter +=andAppender(durationFilter)+" lower(actual_tour_name) = lower(:actual_tour_name) ";
+			durationFilter +=andAppender(durationFilter)+" lower(actual_tour_name) like('%' || lower(:actual_tour_name) || '%')";
 		}
 		if(CommonUtil.isNotBlank(data.getDuration().getTournamentYear()) && CommonUtil.isNotBlank(data.getDuration().getFetchTournaments()) ) {
 			durationFilter +=andAppender(durationFilter)+ " (tournament_year>= :tournament_year-:no_of_past_tournaments and tournament_year<= :tournament_year)";
