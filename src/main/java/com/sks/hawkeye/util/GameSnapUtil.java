@@ -78,7 +78,7 @@ public class GameSnapUtil {
 		return prepareGameSnapShotEntity(tourSnapShot);
 	}
 	public String getActualTourName(String tourname) {
-		return tourname.split("_")[4].split("-")[0].replaceAll("-", " ");
+		return tourname.split("_")[4].replaceAll("-", " ");
 	}
 	public int getTournamentYear(String tourname) {
 		return Integer.parseInt("20"+tourname.split("_")[1]);
