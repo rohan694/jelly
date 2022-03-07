@@ -90,7 +90,7 @@ public class DataServiceImpl implements DataService {
 		}
 		
 		if(CommonUtil.isNotBlank(data.getDuration().getTournamentFormat())) {
-			durationFilter += andAppender(durationFilter)+" format = :format";
+			durationFilter += andAppender(durationFilter)+" lower(format) = lower(:format)";
 		}
 		if(CommonUtil.isNotBlank(data.getDuration().getMatchName())) {
 			durationFilter += andAppender(durationFilter)+"  lower(ma.name) = lower(:match_name)";
@@ -134,28 +134,28 @@ public class DataServiceImpl implements DataService {
 			filtering += andAppender(filtering+durationFilter)+"   lower(bsmn_ptr.name) = lower(:batsman2) ";
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getBatsmanTeam())) {
-			filtering += andAppender(filtering+durationFilter)+"   bat_team.team_name = :batsmanteam ";
+			filtering += andAppender(filtering+durationFilter)+"   lower(bat_team.team_name) = lower(:batsmanteam) ";
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getBowlerName())) {
 			filtering += andAppender(filtering+durationFilter)+"   lower(bowler.name) = lower(:bowlerName) ";
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getBowlerCountry())) {
-			filtering += andAppender(filtering+durationFilter)+"   bowler.team_id = :bowlerCountry ";
+			filtering += andAppender(filtering+durationFilter)+"   lower(bowler.team_id) = lower(:bowlerCountry) ";
 		}
 //		if(CommonUtil.isNotBlank(data.getFiltering().getScore()) && !"All".equals(data.getFiltering().getScore())  && !"0".equals(data.getFiltering().getScore())) {
 //			filtering += " and scoring_info.score = :score ";
 //		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getExtraType())) {
-			filtering += andAppender(filtering+durationFilter)+"   scoring_info.extras_type = :extraType ";
+			filtering += andAppender(filtering+durationFilter)+"   lower(scoring_info.extras_type) = lower(:extraType) ";
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getShotAttacked())) {
-			filtering += andAppender(filtering+durationFilter)+"   shot_info.shot_attacked = :shotAttacked ";
+			filtering += andAppender(filtering+durationFilter)+"   lower(shot_info.shot_attacked) = lower(:shotAttacked) ";
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getShotPlayed())) {
-			filtering += andAppender(filtering+durationFilter)+"   shot_info.shot_played = :shotPlayed ";
+			filtering += andAppender(filtering+durationFilter)+"   lower(shot_info.shot_played) = lower(:shotPlayed) ";
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getDeliveryType())) {
-			filtering += andAppender(filtering+durationFilter)+"   delivery.delivery_type = :deliveryType ";
+			filtering += andAppender(filtering+durationFilter)+"   lower(delivery.delivery_type) = lower(:deliveryType) ";
 		}
 		if(data.getFiltering().isWicket()) {
 			filtering += andAppender(filtering+durationFilter)+"   wicket.wicket = :wicket ";
