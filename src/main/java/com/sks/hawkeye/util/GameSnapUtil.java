@@ -80,6 +80,14 @@ public class GameSnapUtil {
 	public String getActualTourName(String tourname) {
 		return tourname.split("_")[4].replaceAll("-", " ");
 	}
+	public String getTeam1(String matchName) {
+		String[] temp=matchName.split("_");
+		return temp[0].replaceAll("-", " ");
+	}
+	public String getTeam2(String matchName) {
+		String[] temp=matchName.split("_");
+		return temp[1].replaceAll("-", " ");
+	}
 	public int getTournamentYear(String tourname) {
 		return Integer.parseInt("20"+tourname.split("_")[1]);
 	}
@@ -101,6 +109,8 @@ public class GameSnapUtil {
 	private MatchEntity prepare(TourSnapShotEntity gsse,Match m) {
 		MatchEntity me = matchRepository.findByName(m.getName()).orElse(new MatchEntity(gsse));
 		me.setName(m.getName());
+		me.setTeam1(getTeam1(m.getName()));
+		me.setTeam2(getTeam2(m.getName()));
 		me.setVenue(getVenueName(m.getName()));
 		me.addParticipatingTeams(prepare(me, m.getBattingTeam()));
 		me.addParticipatingTeams(prepare(me, m.getBowlingTeam()));
@@ -112,7 +122,7 @@ public class GameSnapUtil {
 		TeamEntity bte=teamRepository.findByTeamName(bt.getName()).orElse( new TeamEntity(me));
 		bte.setId(bt.getId());
 		bte.setHome(bt.isHome());
-		bte.setTeamName(bt.getName());
+		bte.setTeamName(CommonUtil.replaceSpecialChar(bt.getName()));
 		//bte.addPlayer(null);
 		//teamRepository.save(bte);
 		return bte;
@@ -120,7 +130,7 @@ public class GameSnapUtil {
 
 	private TeamEntity prepare(MatchEntity me, BowlingTeam bt) {
 		TeamEntity bte = teamRepository.findByTeamName(bt.getName()).orElse( new TeamEntity(me));
-		bte.setTeamName(bt.getName());
+		bte.setTeamName(CommonUtil.replaceSpecialChar(bt.getName()));
 		bte.setHome(bt.isHome());
 		//teamRepository.save(bte);
 		return bte;

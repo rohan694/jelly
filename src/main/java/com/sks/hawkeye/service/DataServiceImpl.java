@@ -93,7 +93,7 @@ public class DataServiceImpl implements DataService {
 			durationFilter += andAppender(durationFilter)+" lower(format) = lower(:format)";
 		}
 		if(CommonUtil.isNotBlank(data.getDuration().getMatchName())) {
-			durationFilter += andAppender(durationFilter)+"  lower(ma.name) = lower(:match_name)";
+			durationFilter += andAppender(durationFilter)+"(  lower(ma.team1 || ' v ' || ma.team2) = lower(:match_name) or   lower(ma.team2 || ' v ' || ma.team1) = lower(:match_name))";
 		}
 		if(CommonUtil.isNotBlank(data.getDuration().getVenueName())) {
 			durationFilter += andAppender(durationFilter)+"  lower(ma.venue) =lower(:venue_name)";
@@ -218,13 +218,13 @@ public class DataServiceImpl implements DataService {
 			inputs.put("batsman2", CommonUtil.replaceSpecialChar(data.getFiltering().getBatsman2()));
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getBatsmanTeam())) {
-			inputs.put("batsmanteam", data.getFiltering().getBatsmanTeam());
+			inputs.put("batsmanteam", CommonUtil.replaceSpecialChar(data.getFiltering().getBatsmanTeam()));
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getBowlerName())) {
 			inputs.put("bowlerName", CommonUtil.replaceSpecialChar(data.getFiltering().getBowlerName()));
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getBowlerCountry())) {
-			inputs.put("bowlerCountry", data.getFiltering().getBowlerCountry());
+			inputs.put("bowlerCountry", CommonUtil.replaceSpecialChar((data.getFiltering().getBowlerCountry())));
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getScore()) && !"All".equals(data.getFiltering().getScore())) {
 			inputs.put("score", score);
