@@ -88,7 +88,8 @@ public class DataServiceImpl implements DataService {
 		} else if(CommonUtil.isNotBlank(data.getDuration().getTournamentYear())) {
 			durationFilter += andAppender(durationFilter)+" tournament_year = :tournament_year ";
 		}
-		
+	
+
 		if(CommonUtil.isNotBlank(data.getDuration().getTournamentFormat())) {
 			durationFilter += andAppender(durationFilter)+" lower(format) = lower(:format)";
 		}
@@ -127,6 +128,9 @@ public class DataServiceImpl implements DataService {
 		
 		
 		String filtering = "";
+		if(CommonUtil.isNotBlank(data.getFiltering().getTournamentCountry())) {
+			filtering +=andAppender(filtering+durationFilter)+" lower(tss.country) like('%' || lower(:tournament_country) || '%')";
+		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getBatsman1())) {
 			filtering += andAppender(filtering+durationFilter)+"  lower(bsmn.name) = lower(:batsman1) ";
 		}
@@ -222,6 +226,9 @@ public class DataServiceImpl implements DataService {
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getBowlerName())) {
 			inputs.put("bowlerName", CommonUtil.replaceSpecialChar(data.getFiltering().getBowlerName()));
+		}
+		if(CommonUtil.isNotBlank(data.getFiltering().getTournamentCountry())) {
+			inputs.put("tournament_country", CommonUtil.replaceSpecialChar((data.getFiltering().getTournamentCountry())));
 		}
 		if(CommonUtil.isNotBlank(data.getFiltering().getBowlerCountry())) {
 			inputs.put("bowlerCountry", CommonUtil.replaceSpecialChar((data.getFiltering().getBowlerCountry())));

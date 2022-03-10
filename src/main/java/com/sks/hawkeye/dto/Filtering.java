@@ -14,6 +14,7 @@ public class Filtering {
 	private String batsman1 ;
 	private String batsman2 ;
 	private String batsmanTeam ;
+	private String tournamentCountry ;
 	private String bowlerName ;
 	private String bowlerCountry ;
 	private int bouncePosition ;

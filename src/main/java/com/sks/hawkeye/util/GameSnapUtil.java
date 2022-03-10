@@ -100,7 +100,7 @@ public class GameSnapUtil {
 		tsse.setActualTourName(getActualTourName(tss.getTourName()));
 		tsse.setTournamentYear(getTournamentYear(tss.getTourName()));
 		tsse.setInternational(tss.getInternational());
-		tsse.setCountry(tss.getCountry());
+		tsse.setCountry(CommonUtil.replaceSpecialChar(tss.getCountry()));
 		tsse.setFormat(tss.getFormat());
 		tsse.addMatch(prepare(tsse, tss.getMatch()));
 		return tsse;
