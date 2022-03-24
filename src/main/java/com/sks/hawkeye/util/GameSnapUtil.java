@@ -82,8 +82,8 @@ public class GameSnapUtil {
 	}
 	public String getActualMatchName(String matchName) {
 		String[] temp=matchName.split("_");
-		String res=temp[0]+" "+temp[1]+" "+temp[2]+" "+temp[3];
-		return res;
+		String res=temp[0]+" v "+temp[1]+" "+temp[2]+" "+temp[3];
+		return CommonUtil.replaceAllSpecialChar(res);
 	}
 	public String getTeam1(String matchName) {
 		String[] temp=matchName.split("_");

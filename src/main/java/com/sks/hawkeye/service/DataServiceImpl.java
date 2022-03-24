@@ -93,12 +93,7 @@ public class DataServiceImpl implements DataService {
 		}
 		if(CommonUtil.isNotBlank(data.getDuration().getMatchName())) {
 			//durationFilter += andAppender(durationFilter)+"(  lower(ma.team1 || ' v ' || ma.team2) = lower(:match_name) or   lower(ma.team2 || ' v ' || ma.team1) = lower(:match_name))";
-			durationFilter += andAppender(durationFilter)+"(  REPLACE(REPLACE(lower(\r\n"
-					+ "	split_part(ma.name,'_',1) || ' v ' \r\n"
-					+ "	|| split_part(ma.name,'_',2) || ' '\r\n"
-					+ "	|| split_part(ma.name,'_',3) || ' '\r\n"
-					+ "	|| split_part(ma.name,'_',4) || ' '\r\n"
-					+ "), '_', ' '),'-',' ') = lower(:match_name) )";
+			durationFilter += andAppender(durationFilter)+"(  lower(ma.short_name) like( '%' || lower(:match_name) || '%'))";
 		}
 		if(CommonUtil.isNotBlank(data.getDuration().getVenueName())) {
 			durationFilter += andAppender(durationFilter)+"  lower(ma.venue) =lower(:venue_name)";
