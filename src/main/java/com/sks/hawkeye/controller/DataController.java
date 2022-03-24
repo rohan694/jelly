@@ -1,29 +1,20 @@
 package com.sks.hawkeye.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.time.Duration;
+import java.util.*;
 
+import com.sks.hawkeye.dto.*;
+import com.sks.hawkeye.util.ApplicationConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 
-import com.sks.hawkeye.dto.DataRequestDto;
-import com.sks.hawkeye.dto.Filtering;
 import com.sks.hawkeye.response.DataResponse;
-import com.sks.hawkeye.response.ResponseFile;
 import com.sks.hawkeye.service.DataService;
 
-@RestController
+@Controller
 @RequestMapping("/data")
 public class DataController {
 
@@ -35,5 +26,33 @@ public class DataController {
 		List<DataResponse> data = dataService.getData(input);
 		
 		return ResponseEntity.status(HttpStatus.OK).body(data);
+	}
+
+	@PostMapping("/getDataByType")
+	@ResponseBody
+	public ResponseEntity fetchData(@RequestBody PagingRequest pagingRequest) {
+		List<Map<String, Object>> data = new ArrayList<>();
+		if(pagingRequest.getType().equalsIgnoreCase("match")) {
+			data = dataService.getMatchData(pagingRequest);
+		}else if(pagingRequest.getType().equalsIgnoreCase("player")){
+			data = dataService.getPlayerData(pagingRequest);
+		}else if(pagingRequest.getType().equalsIgnoreCase("venue")) {
+			data = dataService.getVenueData(pagingRequest);
+		}
+		Page page = new Page();
+		if(data.size()>0){
+			page.setRecordsTotal(Integer.parseInt(data.get(0).get(ApplicationConstants.totalCount).toString()));
+			page.setRecordsFiltered(Integer.parseInt(data.get(0).get(ApplicationConstants.totalCount).toString()));
+		}
+		page.setData(data);
+
+		return ResponseEntity.status(HttpStatus.OK).body(page);
+	}
+
+	@PostMapping("/getTournamentList")
+	@ResponseBody
+	public ResponseEntity getTournamentName() {
+
+		return ResponseEntity.status(HttpStatus.OK).body(dataService.getTournamentList());
 	}
 }

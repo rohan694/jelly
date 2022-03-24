@@ -10,6 +10,7 @@ import lombok.ToString;
 public class DataResponse {
 	
 	private String matchName;
+	private String venue;
 	private String battingTeamName;
 	private String batsman1;
 	private boolean batsman1RightHanded;

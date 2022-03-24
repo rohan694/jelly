@@ -2,11 +2,17 @@ package com.sks.hawkeye.mapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 import org.springframework.jdbc.core.RowMapper;
 
 import com.sks.hawkeye.response.DataResponse;
 import com.sks.hawkeye.response.ReleasePosition;
+import org.springframework.util.StringUtils;
 
 public class ResponseDtoMapper implements RowMapper<DataResponse> {
 
@@ -16,6 +22,7 @@ public class ResponseDtoMapper implements RowMapper<DataResponse> {
 		DataResponse dto=new DataResponse();
 		try {
 			dto.setMatchName(rs.getString("matchname"));
+			dto.setVenue(rs.getString("venue"));
 			dto.setBattingTeamName(rs.getString("battingteamname"));
 			dto.setBatsman1(rs.getString("batsman1"));
 			dto.setBatsman1RightHanded(rs.getBoolean("batsman1righthanded"));

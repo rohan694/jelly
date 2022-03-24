@@ -9,6 +9,10 @@ import lombok.ToString;
 @ToString
 public class DataRequestDto {
 
+	private String search;
+	private String type;
+	private int page;
+	private int size;
 	private DurationDto duration;
 	private Filtering filtering;
 	
