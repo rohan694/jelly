@@ -23,5 +23,8 @@ public class CommonUtil {
 	public static String replaceSpecialChar(String str) {
 		return str.replaceAll("-", " ");	
 	}
+	public static String replaceAllSpecialChar(String str) {
+		return str.replaceAll("-", " ").replaceAll("_", " ");
+	}
 	
 }

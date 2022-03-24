@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import com.sks.hawkeye.response.DataResponse;
 import com.sks.hawkeye.service.DataService;
 
+@CrossOrigin
 @Controller
 @RequestMapping("/data")
 public class DataController {

@@ -32,6 +32,7 @@ public class MatchEntity {
 	private long id;
 	
 	public String name;
+	public String shortName;
 	public String team1;
 	public String team2;
 	public String venue;
@@ -127,5 +128,11 @@ public class MatchEntity {
 	}
 	public void setTeam2(String team2) {
 		this.team2 = team2;
+	}
+	public String getShortName() {
+		return shortName;
+	}
+	public void setShortName(String shortName) {
+		this.shortName = shortName;
 	}
 }

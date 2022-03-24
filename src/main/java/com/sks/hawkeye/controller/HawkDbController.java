@@ -28,6 +28,7 @@ import com.sks.hawkeye.response.ResponseMessage;
 import com.sks.hawkeye.service.FileDbStorageService;
 import com.sks.hawkeye.service.GameSnapService;
 
+@CrossOrigin
 @Controller
 @RequestMapping("/db")
 public class HawkDbController {

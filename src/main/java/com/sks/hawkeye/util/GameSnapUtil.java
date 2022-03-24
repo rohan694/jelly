@@ -80,6 +80,11 @@ public class GameSnapUtil {
 	public String getActualTourName(String tourname) {
 		return tourname.split("_")[4].replaceAll("-", " ");
 	}
+	public String getActualMatchName(String matchName) {
+		String[] temp=matchName.split("_");
+		String res=temp[0]+" "+temp[1]+" "+temp[2]+" "+temp[3];
+		return res;
+	}
 	public String getTeam1(String matchName) {
 		String[] temp=matchName.split("_");
 		return temp[0].replaceAll("-", " ");
@@ -109,6 +114,7 @@ public class GameSnapUtil {
 	private MatchEntity prepare(TourSnapShotEntity gsse,Match m) {
 		MatchEntity me = matchRepository.findByName(m.getName()).orElse(new MatchEntity(gsse));
 		me.setName(m.getName());
+		me.setShortName(getActualMatchName(m.getName()));
 		me.setTeam1(getTeam1(m.getName()));
 		me.setTeam2(getTeam2(m.getName()));
 		me.setVenue(getVenueName(m.getName()));

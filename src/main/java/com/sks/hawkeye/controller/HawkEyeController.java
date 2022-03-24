@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sks.hawkeye.response.TourSnapShotRes;
 import com.sks.hawkeye.service.GameSnapService;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/hawk")
 public class HawkEyeController {
