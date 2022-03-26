@@ -34,7 +34,7 @@ public class DataServiceImpl implements DataService {
 	@Override
 	public List<DataResponse> getData(DataRequestDto data) {
 
-		String query = "select ma.name as matchName,ma.venue as venue, bsmn.name as batsman1, bsmn.right_handed as batsman1RightHanded, bsmn_ptr.name as batsman2, "
+		String query = "select distinct ma.name as matchName,ma.venue as venue, bsmn.name as batsman1, bsmn.right_handed as batsman1RightHanded, bsmn_ptr.name as batsman2, "
 				+ "bsmn_ptr.right_handed as batsman2RightHand, bsmn.team_id as battingteamname, bowler.team_id as bowlingTeamName, "
 				+ "bowler.name as bowlerName, "
 				+ "bowler.right_handed as isBowlerRightHanded, "
