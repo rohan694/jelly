@@ -3,6 +3,8 @@ package com.sks.hawkeye.controller;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
@@ -97,6 +99,11 @@ public class HawkDbController {
 		}).collect(Collectors.toList());
 
 		return ResponseEntity.status(HttpStatus.OK).body(files);
+	}
+	
+	@GetMapping("/downloadAllFiles")
+	public void downloadAllFiles(HttpServletResponse response) {
+		storageService.downloadAllFiles(response);
 	}
 
 	@GetMapping("/files/{id}")
