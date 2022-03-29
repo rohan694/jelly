@@ -23,6 +23,7 @@ public class Filtering {
 	private String extraType ;
 	private String shotAttacked ;
 	private String shotPlayed ;
+	private int pitchtype ;
 	private String deliveryType ;
 	private boolean wicket ;
 	//private boolean rhbBatsman ;

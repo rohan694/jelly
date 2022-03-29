@@ -170,19 +170,38 @@ public class DataServiceImpl implements DataService {
 		if(data.getFiltering().getIsRightHandedBowler().isPresent()) {
 			filtering += andAppender(filtering+durationFilter)+"   bowler.right_handed =  :isRightHandedBowler";
 		}
-		if(data.getFiltering().getBouncePosition()>0) {
-			if(data.getFiltering().getBouncePosition()==1) filtering += andAppender(filtering+durationFilter)+"   bounce_position.x<0";
-			if(data.getFiltering().getBouncePosition()==2) filtering += andAppender(filtering+durationFilter)+"   (bounce_position.x>0 and bounce_position.x<=2)";
-			if(data.getFiltering().getBouncePosition()==3) filtering += andAppender(filtering+durationFilter)+"   (bounce_position.x>2 and bounce_position.x<=6)";
-			if(data.getFiltering().getBouncePosition()==4) filtering += andAppender(filtering+durationFilter)+"  (bounce_position.x>6 and bounce_position.x<=8)";
-			if(data.getFiltering().getBouncePosition()==5) filtering += andAppender(filtering+durationFilter)+"  (bounce_position.x>8 )";
+		
+		if(data.getFiltering().getPitchtype()==1) {
+			if(data.getFiltering().getBouncePosition()>0) {
+				if(data.getFiltering().getBouncePosition()==1) filtering += andAppender(filtering+durationFilter)+"   bounce_position.x<=0";
+				if(data.getFiltering().getBouncePosition()==2) filtering += andAppender(filtering+durationFilter)+"   (bounce_position.x>0 and bounce_position.x<=2)";
+				if(data.getFiltering().getBouncePosition()==3) filtering += andAppender(filtering+durationFilter)+"   (bounce_position.x>2 and bounce_position.x<=6)";
+				if(data.getFiltering().getBouncePosition()==4) filtering += andAppender(filtering+durationFilter)+"  (bounce_position.x>6 and bounce_position.x<=8)";
+				if(data.getFiltering().getBouncePosition()==5) filtering += andAppender(filtering+durationFilter)+"  (bounce_position.x>8 )";
+			}
+		} else if(data.getFiltering().getPitchtype()==2) {
+			if(data.getFiltering().getBouncePosition()>0) {
+				if(data.getFiltering().getBouncePosition()==1) filtering += andAppender(filtering+durationFilter)+"   bounce_position.x<=0.9";
+				if(data.getFiltering().getBouncePosition()==2) filtering += andAppender(filtering+durationFilter)+"   (bounce_position.x>0.9 and bounce_position.x<=2.8)";
+				if(data.getFiltering().getBouncePosition()==3) filtering += andAppender(filtering+durationFilter)+"   (bounce_position.x>2.8 and bounce_position.x<=5.9)";
+				if(data.getFiltering().getBouncePosition()==4) filtering += andAppender(filtering+durationFilter)+"  (bounce_position.x>5.9 and bounce_position.x<=8.6)";
+				if(data.getFiltering().getBouncePosition()==5) filtering += andAppender(filtering+durationFilter)+"  (bounce_position.x>8.6 )";
+			}
+		} else if(data.getFiltering().getPitchtype()==3) {
+			if(data.getFiltering().getBouncePosition()>0) {
+				if(data.getFiltering().getBouncePosition()==1) filtering += andAppender(filtering+durationFilter)+"   bounce_position.x<=2.8";
+				if(data.getFiltering().getBouncePosition()==2) filtering += andAppender(filtering+durationFilter)+"   (bounce_position.x>2.8 and bounce_position.x<=4.4)";
+				if(data.getFiltering().getBouncePosition()==3) filtering += andAppender(filtering+durationFilter)+"   (bounce_position.x>4.4 and bounce_position.x<=6.2)";
+				if(data.getFiltering().getBouncePosition()==4) filtering += andAppender(filtering+durationFilter)+"  (bounce_position.x>6.2 )";
+			}
 		}
-		if(data.getFiltering().getStumpPosition()>0) {
-			if(data.getFiltering().getStumpPosition()==1) filtering += andAppender(filtering+durationFilter)+"  (((stump_position.y > 0) and (stump_position.y < 0.15)) or ((stump_position.y < 0) and (stump_position.y > -0.15)))";
-			if(data.getFiltering().getStumpPosition()==2) filtering += andAppender(filtering+durationFilter)+"  (case when bsmn.right_handed then stump_position.y>0.3 else stump_position.y<-0.3 end)";
-			if(data.getFiltering().getStumpPosition()==3) filtering += andAppender(filtering+durationFilter)+"  (case when bsmn.right_handed then (stump_position.y>0.15 and stump_position.y<0.3) else (stump_position.y<-0.15 and stump_position.y>-0.3) end)";
-			if(data.getFiltering().getStumpPosition()==4) filtering += andAppender(filtering+durationFilter)+"  (case when bsmn.right_handed then stump_position.y<-0.15 else stump_position.y>0.15 end) ";
-		}
+			if(data.getFiltering().getStumpPosition()>0) {
+				if(data.getFiltering().getStumpPosition()==1) filtering += andAppender(filtering+durationFilter)+"  (((stump_position.y > 0) and (stump_position.y < 0.15)) or ((stump_position.y < 0) and (stump_position.y > -0.15)))";
+				if(data.getFiltering().getStumpPosition()==2) filtering += andAppender(filtering+durationFilter)+"  (case when bsmn.right_handed then stump_position.y>0.3 else stump_position.y<-0.3 end)";
+				if(data.getFiltering().getStumpPosition()==3) filtering += andAppender(filtering+durationFilter)+"  (case when bsmn.right_handed then (stump_position.y>0.15 and stump_position.y<0.3) else (stump_position.y<-0.15 and stump_position.y>-0.3) end)";
+				if(data.getFiltering().getStumpPosition()==4) filtering += andAppender(filtering+durationFilter)+"  (case when bsmn.right_handed then stump_position.y<-0.15 else stump_position.y>0.15 end) ";
+			}
+		
 		String score="";
 
 		if(CommonUtil.isNotBlank(data.getFiltering().getScore()) && !"0".equals(data.getFiltering().getScore())) {
