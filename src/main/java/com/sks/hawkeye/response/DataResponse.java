@@ -33,6 +33,7 @@ public class DataResponse {
 	private ReleasePosition stumpPosition;
 	private ReleasePosition landingPosition;
 	private ReleasePosition impactPosition;
+	private ReleasePosition creasePosition;
 	private boolean isRightHandedBowler;
 	
 	private double innings;
