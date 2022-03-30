@@ -52,6 +52,7 @@ public class DataServiceImpl implements DataService {
 				+ "stump_position.x as stump_position_x, stump_position.y as stump_position_y, stump_position.z as stump_position_z, "
 				+ "landing_position.x as landing_position_x, landing_position.y as landing_position_y,  "
 				+ "landing_position.z as landing_position_z,   "
+				+ "impact_position.x as impact_position_x, impact_position.y as impact_position_y,  impact_position.z as impact_position_z,  "
 				+ "shot_info.shot_attacked as shotAttacked, shot_info.shot_played as shotPlayed "
 				+ "from tour_snap_shot as tss "
 				+ "INNER JOIN match as ma ON ma.tour_id = tss.tour_name "
@@ -72,6 +73,7 @@ public class DataServiceImpl implements DataService {
 				+ "INNER JOIN bounce_position ON bounce_position.trajectory_id = trajectory.id "
 				+ "INNER JOIN stump_position ON stump_position.trajectory_id = trajectory.id "
 				+ "INNER JOIN landing_position ON landing_position.trajectory_id = trajectory.id "
+				+ "INNER JOIN impact_position ON impact_position.trajectory_id = trajectory.id "
 				+ "where ";
 				//+ "order by ma.name,delivery_number.innings, delivery_number.over, delivery_number.ball ASC";
 
